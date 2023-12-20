@@ -339,7 +339,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac7fc8d33e0a9ca48876c3fd135c34df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapSize: 8
+  mapSize: 128
   tileMap: {fileID: 265944198}
   ruleTiles:
   - {fileID: 11400000, guid: 6ffa9c5e7ff44e54e94e402ef22c7f30, type: 2}
