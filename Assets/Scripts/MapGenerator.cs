@@ -4,12 +4,13 @@ using UnityEngine.Tilemaps;
 
 public class MapGenerator : MonoBehaviour
 {
+    public int mapSize = 256;
     public Tilemap tileMap;
     public List<RuleTile> ruleTiles;
 
     void Start()
     {
-        Generate(16);
+        Generate(mapSize);
     }
 
     private void Generate(int tiles)
@@ -21,5 +22,9 @@ public class MapGenerator : MonoBehaviour
                 tileMap.SetTile(new Vector3Int(x,y), ruleTiles[0]);
             }
         }
+
+        tileMap.SetTile(new Vector3Int(2, 2), null);
+        tileMap.SetTile(new Vector3Int(6, 6), null);
+        tileMap.SetTile(new Vector3Int(6, 7), null);
     }
 }
