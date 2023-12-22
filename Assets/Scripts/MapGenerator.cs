@@ -8,12 +8,15 @@ public class MapGenerator : MonoBehaviour
 {
     [Range(32, 1024)] public int mapSize = 256;
     [Range(0.0f, 1.0f)][Tooltip("Terrain roughness. Higher numbers gives more randomness.")] public float terrainRoughness = 1.0f;
+    [Range(1.0f, 100.0f)][Tooltip("Terrain micro roughness. Higher numbers gives more micro randomness.")] public float terrainMicroRoughness = 10.0f;
     [Range(0.0f, 1.0f)][Tooltip("Average terrain height.")] public float averageHeight = 0.5f;
-    [Range(1, 10)][Tooltip("Iterations for Diamond Square Algo -> Higher values makes the terrain more natural.")]public int dsqIterations = 5;
-    [Range(0, 10)][Tooltip("Iteration count for smoothing the terrain.")]public int smoothingIterations = 1;
+    [Range(1, 10)][Tooltip("Iterations for Diamond Square Algo -> Higher values makes the terrain more natural.")] public int dsqIterations = 5;
+    [Range(0, 10)][Tooltip("Iteration count for smoothing the terrain.")] public int smoothingIterations = 1;
 
     public Tilemap tileMap;
     public List<RuleTile> ruleTiles;
+
+    [Tooltip("Seeds for map generation. dsqIterations count and seed count must be qual!")] public List<Vector2> seeds;
 
     public float[,] heightMap { get; private set; }
     [SerializeField] private Texture2D mapTexture;
@@ -41,13 +44,18 @@ public class MapGenerator : MonoBehaviour
         stopwatch.Reset();
     }
 
+    public float GetHeight(int x, int y) => heightMap[x, y];
+
+    public float GetHeight(Vector3Int pos) => heightMap[pos.x, pos.y];
+
     private void Generate()
     {
         heightMap = new float[mapSize, mapSize];
 
-        //fill heightmap with diamond square algo
-        DiamondSquareGenerator dsqg = new DiamondSquareGenerator(mapSize, terrainRoughness, averageHeight);
+        DiamondSquareGenerator dsqg = new DiamondSquareGenerator(mapSize, terrainRoughness, averageHeight, terrainMicroRoughness, seeds.ToArray());
         heightMap = dsqg.GenerateTerrain(dsqIterations);
+
+        tileMap.enabled = false;
 
         for (int y = 0; y < mapSize; y++)
         {
@@ -55,12 +63,11 @@ public class MapGenerator : MonoBehaviour
             {
                 Vector3Int position = new Vector3Int(x, y);
 
-                //fill heightmap with perlin noise
-                //float height = heightMap[x, y] = GetPerlin(position, 10f, Vector2.zero);
-
                 if (heightMap[x, y] > 0.5f) tileMap.SetTile(position, ruleTiles[0]);
             }
         }
+
+        tileMap.enabled = true;
     }
 
     private void GenerateMapTexture()
@@ -77,14 +84,6 @@ public class MapGenerator : MonoBehaviour
         }
 
         mapTexture.Apply();
-    }
-
-    private float GetPerlin(Vector3Int position, float scale, Vector2 offset)
-    {
-        float xCoord = (float)position.x / mapSize * scale + offset.x;
-        float zCoord = (float)position.y / mapSize * scale + offset.y;
-
-        return Mathf.PerlinNoise(xCoord, zCoord);
     }
 
     private void SmoothTerrain(int iterations)
