@@ -13,20 +13,24 @@ public class DiamondSquareGenerator
         this.cornersInitialValue = cornersInitialValue;
     }
 
-    public float[,] GenerateTerrain()
+    public float[,] GenerateTerrain(int iterations)
     {
         int terrainSize = terrainPoints + 1;
         float[,] terrainData = new float[terrainSize, terrainSize];
 
-        // Set seed value to corners
+        // Initialize the terrain data with the initial corners
         terrainData[0, 0] = terrainData[0, terrainSize - 1] = terrainData[terrainSize - 1, 0] = terrainData[terrainSize - 1, terrainSize - 1] = cornersInitialValue;
 
-        // Terrain generation using Diamond-Square algorithm
-        float range = roughness;
-        for (int sideLength = terrainSize - 1; sideLength >= 2; sideLength /= 2, range *= 0.5f)
+        for (int iteration = 0; iteration < iterations; iteration++)
         {
-            GenerateSquares(terrainData, sideLength, range);
-            GenerateDiamonds(terrainData, sideLength, range);
+            float range = roughness;
+
+            // Terrain generation using Diamond-Square algorithm
+            for (int sideLength = terrainSize - 1; sideLength >= 2; sideLength /= 2, range *= 0.5f)
+            {
+                GenerateSquares(terrainData, sideLength, range);
+                GenerateDiamonds(terrainData, sideLength, range);
+            }
         }
 
         return terrainData;
@@ -41,9 +45,9 @@ public class DiamondSquareGenerator
             for (int y = 0; y < terrainData.GetLength(1) - 1; y += sideLength)
             {
                 float average = (terrainData[x, y] + terrainData[x + sideLength, y] +
-                                 terrainData[x, y + sideLength] + terrainData[x + sideLength, y + sideLength]) / 4.0f;
+                                 terrainData[x, y + sideLength] + terrainData[x + sideLength, y + sideLength]) * 0.25f;
 
-                terrainData[x + halfSide, y + halfSide] = average + (Random.Range(0.0f, 1.0f) * 2 * range) - range;
+                terrainData[x + halfSide, y + halfSide] = average + (Random.Range(0.0f, 1.0f) * 2.0f * range) - range;
             }
         }
     }
@@ -59,7 +63,7 @@ public class DiamondSquareGenerator
                 float average = (terrainData[(x - halfSide + terrainData.GetLength(0)) % terrainData.GetLength(0), y] +
                                  terrainData[(x + halfSide) % terrainData.GetLength(0), y] +
                                  terrainData[x, (y + halfSide) % terrainData.GetLength(1)] +
-                                 terrainData[x, (y - halfSide + terrainData.GetLength(1)) % terrainData.GetLength(1)]) / 4.0f;
+                                 terrainData[x, (y - halfSide + terrainData.GetLength(1)) % terrainData.GetLength(1)]) * 0.25f;
 
                 average += (Random.Range(0.0f, 1.0f) * 2 * range) - range;
                 terrainData[x, y] = average;

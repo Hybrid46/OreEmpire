@@ -1,47 +1,66 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Debug = UnityEngine.Debug;
 
 public class MapGenerator : MonoBehaviour
 {
-    public int mapSize = 256;
+    [Range(32, 1024)] public int mapSize = 256;
+    [Range(0.0f, 1.0f)][Tooltip("Terrain roughness. Higher numbers gives more randomness.")] public float terrainRoughness = 1.0f;
+    [Range(0.0f, 1.0f)][Tooltip("Average terrain height.")] public float averageHeight = 0.5f;
+    [Range(1, 10)][Tooltip("Iterations for Diamond Square Algo -> Higher values makes the terrain more natural.")]public int dsqIterations = 5;
+    [Range(0, 10)][Tooltip("Iteration count for smoothing the terrain.")]public int smoothingIterations = 1;
+
     public Tilemap tileMap;
     public List<RuleTile> ruleTiles;
 
-    private float[,] heightMap;
+    public float[,] heightMap { get; private set; }
     [SerializeField] private Texture2D mapTexture;
 
     void Start()
     {
-        Generate(mapSize);
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+        //TODO -> job
+        Generate();
+        stopwatch.Stop();
+        Debug.Log($"Generate time -> {stopwatch.ElapsedMilliseconds}");
+        stopwatch.Reset();
+
+        stopwatch.Start();
+        SmoothTerrain(smoothingIterations);
+        stopwatch.Stop();
+        Debug.Log($"SmoothTerrain time -> {stopwatch.ElapsedMilliseconds}");
+        stopwatch.Reset();
+
+        stopwatch.Start();
         GenerateMapTexture();
+        stopwatch.Stop();
+        Debug.Log($"GenerateMapTexture time -> {stopwatch.ElapsedMilliseconds}");
+        stopwatch.Reset();
     }
 
-    private void Generate(int tiles)
+    private void Generate()
     {
         heightMap = new float[mapSize, mapSize];
 
-        //fill heightmap with diamond square algo first
-        DiamondSquareGenerator dsqg = new DiamondSquareGenerator(mapSize, 0.9f, 0.5f);
-        heightMap = dsqg.GenerateTerrain();
+        //fill heightmap with diamond square algo
+        DiamondSquareGenerator dsqg = new DiamondSquareGenerator(mapSize, terrainRoughness, averageHeight);
+        heightMap = dsqg.GenerateTerrain(dsqIterations);
 
-        //fill heightmap with perlin sampling to make more randomness
-
-
-        for (int y = 0; y < tiles; y++)
+        for (int y = 0; y < mapSize; y++)
         {
-            for (int x = 0; x < tiles; x++)
+            for (int x = 0; x < mapSize; x++)
             {
                 Vector3Int position = new Vector3Int(x, y);
-                float noiseValue = GetPerlin(position, 20f, Vector2.zero);
 
-                if (noiseValue > 0.5f) tileMap.SetTile(position, ruleTiles[0]);
+                //fill heightmap with perlin noise
+                //float height = heightMap[x, y] = GetPerlin(position, 10f, Vector2.zero);
+
+                if (heightMap[x, y] > 0.5f) tileMap.SetTile(position, ruleTiles[0]);
             }
         }
-
-        tileMap.SetTile(new Vector3Int(2, 2), null);
-        tileMap.SetTile(new Vector3Int(6, 6), null);
-        tileMap.SetTile(new Vector3Int(6, 7), null);
     }
 
     private void GenerateMapTexture()
@@ -67,4 +86,30 @@ public class MapGenerator : MonoBehaviour
 
         return Mathf.PerlinNoise(xCoord, zCoord);
     }
+
+    private void SmoothTerrain(int iterations)
+    {
+        for (int iteration = 0; iteration < iterations; iteration++)
+        {
+            for (int x = 0; x < heightMap.GetLength(0) - 1; x += 2)
+            {
+                for (int y = 0; y < heightMap.GetLength(1) - 1; y += 2)
+                {
+                    SmoothSquare(x, y);
+                }
+            }
+        }
+
+        void SmoothSquare(int x, int y)
+        {
+            float average = (heightMap[x, y] + heightMap[x + 1, y] +
+                             heightMap[x, y + 1] + heightMap[x + 1, y + 1]) * 0.25f;
+
+            heightMap[x, y] = average;
+            heightMap[x + 1, y] = average;
+            heightMap[x, y + 1] = average;
+            heightMap[x + 1, y + 1] = average;
+        }
+    }
+
 }
