@@ -343,11 +343,12 @@ MonoBehaviour:
   terrainRoughness: 1
   terrainMicroRoughness: 10
   averageHeight: 0.5
-  dsqIterations: 5
+  dsqIterations: 3
   smoothingIterations: 1
   tileMap: {fileID: 265944198}
   ruleTiles:
   - {fileID: 11400000, guid: 6ffa9c5e7ff44e54e94e402ef22c7f30, type: 2}
+  seeds: []
   mapTexture: {fileID: 0}
 --- !u!1 &519420028
 GameObject:

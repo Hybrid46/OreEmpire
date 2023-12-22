@@ -28,19 +28,19 @@ public class MapGenerator : MonoBehaviour
         //TODO -> job
         Generate();
         stopwatch.Stop();
-        Debug.Log($"Generate time -> {stopwatch.ElapsedMilliseconds}");
+        Debug.Log($"Generate time -> {stopwatch.ElapsedMilliseconds} ms");
         stopwatch.Reset();
 
         stopwatch.Start();
         SmoothTerrain(smoothingIterations);
         stopwatch.Stop();
-        Debug.Log($"SmoothTerrain time -> {stopwatch.ElapsedMilliseconds}");
+        Debug.Log($"SmoothTerrain time -> {stopwatch.ElapsedMilliseconds} ms");
         stopwatch.Reset();
 
         stopwatch.Start();
         GenerateMapTexture();
         stopwatch.Stop();
-        Debug.Log($"GenerateMapTexture time -> {stopwatch.ElapsedMilliseconds}");
+        Debug.Log($"GenerateMapTexture time -> {stopwatch.ElapsedMilliseconds} ms");
         stopwatch.Reset();
     }
 
