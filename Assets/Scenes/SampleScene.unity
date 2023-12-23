@@ -200,7 +200,7 @@ TilemapRenderer:
   m_MaxChunkCount: 16
   m_MaxFrameAge: 16
   m_SortOrder: 0
-  m_Mode: 0
+  m_Mode: 2
   m_DetectChunkCullingBounds: 0
   m_MaskInteraction: 0
 --- !u!1839735485 &265944198
@@ -347,7 +347,8 @@ MonoBehaviour:
   smoothingIterations: 1
   tileMap: {fileID: 265944198}
   ruleTiles:
-  - {fileID: 11400000, guid: 6ffa9c5e7ff44e54e94e402ef22c7f30, type: 2}
+  - {fileID: 11400000, guid: 287db2f5d689bf64aab8faea7bdfcbeb, type: 2}
+  - {fileID: 11400000, guid: 8b99eb9acdff4654ba50543ee212aa1e, type: 2}
   seeds: []
   mapTexture: {fileID: 0}
 --- !u!1 &519420028

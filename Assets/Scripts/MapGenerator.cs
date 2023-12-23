@@ -63,7 +63,10 @@ public class MapGenerator : MonoBehaviour
             {
                 Vector3Int position = new Vector3Int(x, y);
 
-                if (heightMap[x, y] > 0.5f) tileMap.SetTile(position, ruleTiles[0]);
+                if (heightMap[x, y] > 0.5f)
+                    tileMap.SetTile(position, ruleTiles[0]);
+                else
+                    tileMap.SetTile(position, ruleTiles[1]);
             }
         }
 
