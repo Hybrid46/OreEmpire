@@ -347,8 +347,8 @@ MonoBehaviour:
   smoothingIterations: 1
   tileMap: {fileID: 265944198}
   ruleTiles:
-  - {fileID: 11400000, guid: 3d8e9452c5704cd4794d19c6ef817671, type: 2}
-  - {fileID: 11400000, guid: 8b99eb9acdff4654ba50543ee212aa1e, type: 2}
+  - {fileID: 11400000, guid: 718631312bf38374db2b08feff266f23, type: 2}
+  - {fileID: 11400000, guid: 097b080fffd9fd64da21b12891e2c17e, type: 2}
   seeds: []
   mapTexture: {fileID: 0}
 --- !u!1 &519420028
