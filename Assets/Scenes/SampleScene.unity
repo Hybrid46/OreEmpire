@@ -293,7 +293,7 @@ GameObject:
   - component: {fileID: 459763823}
   - component: {fileID: 459763822}
   m_Layer: 0
-  m_Name: PropsRocks
+  m_Name: PropsRocksOres
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

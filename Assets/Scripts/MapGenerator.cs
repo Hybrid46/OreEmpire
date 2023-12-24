@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Debug = UnityEngine.Debug;
 using Random = UnityEngine.Random;
 
-public class MapGenerator : MonoBehaviour
+public class MapGenerator : Singleton<MapGenerator>
 {
     [Range(32, 1024)] public int mapSize = 256;
     [Range(0.0f, 1.0f)][Tooltip("Terrain roughness. Higher numbers gives more randomness.")] public float terrainRoughness = 1.0f;
@@ -207,7 +208,7 @@ public class MapGenerator : MonoBehaviour
     void FloodFillOres(int x, int y, OreType oreType)
     {
         // Stop if out of bounds, chance of spawning less then needed or already filled
-        if (x < 0 || x >= mapSize || y < 0 || y >= mapSize ||
+        if (!IsOnMap(x,y) ||
             oreMap[x, y] != OreType.None ||
             Random.Range(0.0f, 1.0f) < mapSettings.oreFieldSize)
         {
@@ -286,4 +287,6 @@ public class MapGenerator : MonoBehaviour
 
         return points;
     }
+
+    public bool IsOnMap(float x, float y) => x >= 0 || x <= mapSize || y >= 0 || y <= mapSize;
 }
