@@ -81,7 +81,7 @@ public class DiamondSquareGenerator
                 int posX = x + halfSide;
                 int posY = y + halfSide;
 
-                terrainData[posX, posY] = average + (GetPerlin(posX, posY, terrainData.GetLength(0), perlinScale, offset) * 2.0f * range) - range;
+                terrainData[posX, posY] = Mathf.Clamp01(average + (GetPerlin(posX, posY, terrainData.GetLength(0), perlinScale, offset) * 2.0f * range) - range);
             }
         }
     }
@@ -100,6 +100,8 @@ public class DiamondSquareGenerator
                                  terrainData[x, (y - halfSide + terrainData.GetLength(1)) % terrainData.GetLength(1)]) * 0.25f;
 
                 average += (GetPerlin(x, y, terrainData.GetLength(0), perlinScale, offset) * 2 * range) - range;
+                average = Mathf.Clamp01(average);
+
                 terrainData[x, y] = average;
 
                 if (x == 0) terrainData[terrainData.GetLength(0) - 1, y] = average;

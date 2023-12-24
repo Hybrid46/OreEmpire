@@ -504,21 +504,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mapSize: 512
   terrainRoughness: 1
-  terrainMicroRoughness: 10
+  terrainMicroRoughness: 50
   averageHeight: 0.5
-  dsqIterations: 3
-  smoothingIterations: 1
+  dsqIterations: 5
+  smoothingIterations: 2
   terrainTileMap: {fileID: 265944198}
   propsRocksTileMap: {fileID: 459763823}
   ruleTiles:
   - {fileID: 11400000, guid: 718631312bf38374db2b08feff266f23, type: 2}
+  - {fileID: 11400000, guid: 3d8e9452c5704cd4794d19c6ef817671, type: 2}
+  - {fileID: 11400000, guid: 8b99eb9acdff4654ba50543ee212aa1e, type: 2}
+  - {fileID: 11400000, guid: 842f2eb1e2d6d3c4cae6f7e33ae840a6, type: 2}
   - {fileID: 11400000, guid: 097b080fffd9fd64da21b12891e2c17e, type: 2}
+  - {fileID: 11400000, guid: 0e7384e0ae23a714ea2659ecd9fdb332, type: 2}
   seeds: []
   mapTexture: {fileID: 0}
   mapSettings:
     type: 0
-    oreFieldSize: 0.843
-    oreFieldSpacing: 10
+    oreFieldSize: 0.745
+    oreFieldSpacing: 20
     cliffContinuity: 0.3
   ores:
   - type: 1

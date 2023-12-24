@@ -117,11 +117,9 @@ public class MapGenerator : MonoBehaviour
             for (int x = 0; x < mapSize; x++)
             {
                 Vector3Int position = new Vector3Int(x, y);
+                int tileIndex = (int)(heightMap[x, y] * (ruleTiles.Count - 1));
 
-                if (heightMap[x, y] > 0.5f)
-                    terrainTileMap.SetTile(position, ruleTiles[0]);
-                else
-                    terrainTileMap.SetTile(position, ruleTiles[1]);
+                terrainTileMap.SetTile(position, ruleTiles[tileIndex]);
             }
         }
 
@@ -211,7 +209,7 @@ public class MapGenerator : MonoBehaviour
         // Stop if out of bounds, chance of spawning less then needed or already filled
         if (x < 0 || x >= mapSize || y < 0 || y >= mapSize ||
             oreMap[x, y] != OreType.None ||
-            Random.Range(0.0f,1.0f) < mapSettings.oreFieldSize)
+            Random.Range(0.0f, 1.0f) < mapSettings.oreFieldSize)
         {
             return;
         }
