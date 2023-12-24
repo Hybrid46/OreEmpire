@@ -517,11 +517,11 @@ MonoBehaviour:
   mapTexture: {fileID: 0}
   mapSettings:
     type: 0
-    oreFieldSize: 0.2
+    oreFieldSize: 0.843
     oreFieldSpacing: 10
     cliffContinuity: 0.3
   ores:
-  - type: 0
+  - type: 1
     tile: {fileID: 11400000, guid: 3ac03f1c366ad9340a1f916396cc57ed, type: 2}
 --- !u!1 &519420028
 GameObject:

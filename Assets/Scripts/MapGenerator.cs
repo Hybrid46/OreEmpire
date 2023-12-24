@@ -51,9 +51,10 @@ public class MapGenerator : MonoBehaviour
 
     public enum OreType
     {
-        Copper = 0,
-        Sand = 1,
-        Water = 2
+        None,
+        Copper,
+        Sand,
+        Water
     }
 
     public OreType[,] oreMap;
@@ -171,6 +172,15 @@ public class MapGenerator : MonoBehaviour
     private void InitializeOres()
     {
         oreMap = new OreType[mapSize, mapSize];
+
+        for (int y = 0; y < mapSize; y++)
+        {
+            for (int x = 0; x < mapSize; x++)
+            {
+                oreMap[x, y] = OreType.None;
+            }
+        }
+
         oresD = new Dictionary<OreType, RuleTile>(ores.Count);
 
         ores.ForEach(ore => oresD.Add(ore.type, ore.tile));
@@ -188,15 +198,34 @@ public class MapGenerator : MonoBehaviour
             //TODO floodfill ores and make cliffs
 
             //testing
-            OreType oreType = (OreType)Random.Range(1, ores.Count) - 1;
-            Debug.Log(oreType.ToString());
-            oreMap[roundedPoint.x, roundedPoint.y] = oreType;
+            OreType oreType = ores[Random.Range(1, ores.Count) - 1].type;
 
-            propsRocksTileMap.SetTile(new Vector3Int(roundedPoint.x, roundedPoint.y), GetOreRuleTile(oreType));
+            FloodFillOres(roundedPoint.x, roundedPoint.y, oreType);
         }
     }
 
     private RuleTile GetOreRuleTile(OreType oreType) => oresD[oreType];
+
+    void FloodFillOres(int x, int y, OreType oreType)
+    {
+        // Stop if out of bounds, chance of spawning less then needed or already filled
+        if (x < 0 || x >= mapSize || y < 0 || y >= mapSize ||
+            oreMap[x, y] != OreType.None ||
+            Random.Range(0.0f,1.0f) < mapSettings.oreFieldSize)
+        {
+            return;
+        }
+
+        // Fill the current cell wit ore
+        oreMap[x, y] = oreType;
+        propsRocksTileMap.SetTile(new Vector3Int(x, y), GetOreRuleTile(oreType));
+
+        // Recursively fill in 4 directions
+        FloodFillOres(x + 1, y, oreType);
+        FloodFillOres(x - 1, y, oreType);
+        FloodFillOres(x, y + 1, oreType);
+        FloodFillOres(x, y - 1, oreType);
+    }
 
     private List<Vector2> GeneratePoissonPoints(float minDistance, int maxAttempts)
     {
