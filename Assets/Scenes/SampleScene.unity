@@ -454,6 +454,7 @@ GameObject:
   - component: {fileID: 465448279}
   - component: {fileID: 465448278}
   - component: {fileID: 465448280}
+  - component: {fileID: 465448281}
   m_Layer: 0
   m_Name: Grid
   m_TagString: Untagged
@@ -521,12 +522,27 @@ MonoBehaviour:
   mapTexture: {fileID: 0}
   mapSettings:
     type: 0
-    oreFieldSize: 0.745
-    oreFieldSpacing: 20
+    oreFieldSize: 0.75
+    oreFieldSpacing: 10
     cliffContinuity: 0.3
   ores:
   - type: 1
     tile: {fileID: 11400000, guid: 3ac03f1c366ad9340a1f916396cc57ed, type: 2}
+--- !u!114 &465448281
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 465448277}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65ce15fb2bfced54ca9226ddf1629449, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buildings:
+  - {fileID: 3250133727670808211, guid: 0ad98d07e5b9725488c513dda5a26460, type: 3}
+  - {fileID: 5112331208609540938, guid: 398c29d2f667f0342a40e15a1ee1f317, type: 3}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -695,7 +711,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &619394801
 MonoBehaviour:
   m_ObjectHideFlags: 0

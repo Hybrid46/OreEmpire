@@ -21,7 +21,7 @@ public static class StaticUtils
 
     public static Vector2Int Array1dTo2d(int i, int width) => new Vector2Int { x = i % width, y = i / width };
 
-    public static bool PointInsideSphere(Vector3 Ppoint, Vector3 Ccenter, float Cradius) => (Vector3.Distance(Ppoint, Ccenter) <= Cradius);
+    public static bool PointInsideSphere(Vector3 point, Vector3 center, float radius) => (Vector3.Distance(point, center) <= radius);
 
     public static float Rounder(float x, float g = 16) => Mathf.Floor((x + g / 2) / g) * g;
 
@@ -30,6 +30,8 @@ public static class StaticUtils
     public static int RounderInt(int x, int g = 16) => (int)Mathf.Floor((x + g / 2) / g) * g;
 
     public static bool IsInAngle(Vector3 normal, Vector3 direction, float angle) => Mathf.Abs(Vector3.Dot(normal, direction)) <= angle;
+
+    public static Vector3 MouseToWorldPosition() => Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
     public static Vector3 Snap(Vector3 pos, int v)
     {
@@ -208,5 +210,24 @@ public static class StaticUtils
         pattern.TrimExcess();
 
         return pattern.ToArray();
+    }
+
+    //Builds 2D MxM matrix pattern, size based
+    public static Vector2Int[] GetPattern(int sizeX, int SizeY)
+    {
+        Vector2Int[] pattern = new Vector2Int[sizeX * SizeY];
+
+        int index = 0;
+
+        for (int y = 0; y < SizeY; y++)
+        {
+            for (int x = 0; x < sizeX; x++)
+            {
+                pattern[index] = new Vector2Int(x, y);
+                index++;
+            }
+        }
+
+        return pattern;
     }
 }

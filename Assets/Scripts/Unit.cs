@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class Unit : MonoBehaviour
 {
+    public int sizeX;
+    public int sizeY;
+
     public int armor;
     public int hp;
 

@@ -25,8 +25,9 @@ public class MapGenerator : Singleton<MapGenerator>
 
     [SerializeField] private Texture2D mapTexture;
 
-    [Serializable]
-    public enum TileHeightType : byte { Ground, Water, Cliff }
+    [Serializable] public enum TileHeightType : byte { Ground, Water, Cliff }
+    [Serializable] public enum MapType { Summer, Winter, DeepOcean }
+    [Serializable] public enum TransportDirection { None, Up, Down, Right, Left } //TODO for ore transportation belts -> should I use this with a dictionary O(1+hash) instead of a switch O(1-4)?
 
     [Serializable]
     public struct Ore
@@ -41,18 +42,18 @@ public class MapGenerator : Singleton<MapGenerator>
         public float height;
         public TileHeightType heightType;
         public OreType oreType;
+        public bool built;
 
-        public GridCell(float height, TileHeightType heightType, OreType oreType)
+        public GridCell(float height)
         {
             this.height = height;
-            this.heightType = heightType;
-            this.oreType = oreType;
+            this.heightType = TileHeightType.Ground;
+            this.oreType = OreType.None;
+            this.built = false;
         }
     }
 
     public GridCell[,] grid { get; private set; }
-
-    public enum MapType { Summer, Winter, DeepOcean }
 
     [Serializable]
     public struct MapSettings
@@ -118,7 +119,7 @@ public class MapGenerator : Singleton<MapGenerator>
         {
             for (int x = 0; x < mapSize; x++)
             {
-                grid[x, y] = new GridCell(heightMap[x, y], TileHeightType.Ground, OreType.None);
+                grid[x, y] = new GridCell(heightMap[x, y]);
 
                 Vector3Int position = new Vector3Int(x, y);
                 int tileIndex = (int)(grid[x, y].height * (ruleTiles.Count - 1));
@@ -283,5 +284,10 @@ public class MapGenerator : Singleton<MapGenerator>
         return points;
     }
 
-    public bool IsOnMap(int x, int y) => x >= 0 && x < mapSize && y >= 0 && y < mapSize;
+    public bool IsOnMap(int x, int y)
+    {
+        if (x < 0 || x >= mapSize) return false;
+        if (y < 0 || y >= mapSize) return false;
+        return true;
+    }
 }
