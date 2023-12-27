@@ -24,6 +24,7 @@ public class MapGenerator : Singleton<MapGenerator>
     [SerializeField] private Texture2D mapTexture;
 
     [Flags]
+    [Serializable]
     public enum TileHeightType : byte
     {
         None = 0,
@@ -32,9 +33,29 @@ public class MapGenerator : Singleton<MapGenerator>
         Cliff = 1 << 2,
     }
 
-    public float[,] heightMap { get; private set; }
+    [Serializable]
+    public struct Ore
+    {
+        public OreType type;
+        public RuleTile tile;
+    }
 
-    public TileHeightType[,] heightMapType { get; private set; }
+    [Serializable]
+    public struct GridCell
+    {
+        public float height;
+        public TileHeightType heightType;
+        public OreType oreType;
+
+        public GridCell(float height, TileHeightType heightType, OreType oreType)
+        {
+            this.height = height;
+            this.heightType = heightType;
+            this.oreType = oreType;
+        }
+    }
+
+    public GridCell[,] grid { get; private set; }
 
     public enum MapType { Summer, Winter, DeepOcean }
 
@@ -44,7 +65,7 @@ public class MapGenerator : Singleton<MapGenerator>
         public MapType type;
         [Range(0.0f, 0.9f)] public float oreFieldSize;
         public float oreFieldSpacing;
-        [Range(0.0f, 1.0f)] public float cliffContinuity;
+        [Range(0.0f, 1.0f)] public float cliffContinuity; //TODO -> use it in floodfill when generating cliffs
     }
 
     public MapSettings mapSettings;
@@ -55,15 +76,6 @@ public class MapGenerator : Singleton<MapGenerator>
         Copper,
         Sand,
         Water
-    }
-
-    public OreType[,] oreMap;
-
-    [Serializable]
-    public struct Ore
-    {
-        public OreType type;
-        public RuleTile tile;
     }
 
     public List<Ore> ores;
@@ -99,31 +111,25 @@ public class MapGenerator : Singleton<MapGenerator>
         stopwatch.Reset();
     }
 
-    public float GetHeight(int x, int y) => heightMap[x, y];
-
-    public float GetHeight(Vector3Int pos) => heightMap[pos.x, pos.y];
-
     private void Generate()
     {
-        heightMap = new float[mapSize, mapSize];
+        grid = new GridCell[mapSize, mapSize];
 
         DiamondSquareGenerator dsqg = new DiamondSquareGenerator(mapSize, terrainRoughness, averageHeight, terrainMicroRoughness, seeds.ToArray());
-        heightMap = dsqg.GenerateTerrain(dsqIterations);
-
-        terrainTileMap.enabled = false;
+        float[,] heightMap = dsqg.GenerateTerrain(dsqIterations);
 
         for (int y = 0; y < mapSize; y++)
         {
             for (int x = 0; x < mapSize; x++)
             {
+                grid[x, y] = new GridCell(heightMap[x, y], TileHeightType.Ground, OreType.None);
+
                 Vector3Int position = new Vector3Int(x, y);
-                int tileIndex = (int)(heightMap[x, y] * (ruleTiles.Count - 1));
+                int tileIndex = (int)(grid[x, y].height * (ruleTiles.Count - 1));
 
                 terrainTileMap.SetTile(position, ruleTiles[tileIndex]);
             }
         }
-
-        terrainTileMap.enabled = true;
     }
 
     private void GenerateMapTexture()
@@ -134,7 +140,7 @@ public class MapGenerator : Singleton<MapGenerator>
         {
             for (int x = 0; x < mapSize; x++)
             {
-                float height = heightMap[x, y];
+                float height = grid[x, y].height;
                 mapTexture.SetPixel(x, y, new Color(height, height, height));
             }
         }
@@ -146,9 +152,9 @@ public class MapGenerator : Singleton<MapGenerator>
     {
         for (int iteration = 0; iteration < iterations; iteration++)
         {
-            for (int x = 0; x < heightMap.GetLength(0) - 1; x += 2)
+            for (int x = 0; x < mapSize - 1; x += 2)
             {
-                for (int y = 0; y < heightMap.GetLength(1) - 1; y += 2)
+                for (int y = 0; y < mapSize - 1; y += 2)
                 {
                     SmoothSquare(x, y);
                 }
@@ -157,28 +163,18 @@ public class MapGenerator : Singleton<MapGenerator>
 
         void SmoothSquare(int x, int y)
         {
-            float average = (heightMap[x, y] + heightMap[x + 1, y] +
-                             heightMap[x, y + 1] + heightMap[x + 1, y + 1]) * 0.25f;
+            float average = (grid[x, y].height + grid[x + 1, y].height +
+                             grid[x, y + 1].height + grid[x + 1, y + 1].height) * 0.25f;
 
-            heightMap[x, y] = average;
-            heightMap[x + 1, y] = average;
-            heightMap[x, y + 1] = average;
-            heightMap[x + 1, y + 1] = average;
+            grid[x, y].height = average;
+            grid[x + 1, y].height = average;
+            grid[x, y + 1].height = average;
+            grid[x + 1, y + 1].height = average;
         }
     }
 
     private void InitializeOres()
     {
-        oreMap = new OreType[mapSize, mapSize];
-
-        for (int y = 0; y < mapSize; y++)
-        {
-            for (int x = 0; x < mapSize; x++)
-            {
-                oreMap[x, y] = OreType.None;
-            }
-        }
-
         oresD = new Dictionary<OreType, RuleTile>(ores.Count);
 
         ores.ForEach(ore => oresD.Add(ore.type, ore.tile));
@@ -186,37 +182,33 @@ public class MapGenerator : Singleton<MapGenerator>
 
     private void GenerateOresAndCliffs()
     {
-        List<Vector2> poissonPoints = GeneratePoissonPoints(5.0f, 20);
+        List<Vector2> poissonPoints = GeneratePoissonPoints(mapSettings.oreFieldSpacing, 20);
 
-        //generate ores and cliffs
         foreach (Vector2 point in poissonPoints)
         {
             Vector2Int roundedPoint = Vector2Int.RoundToInt(point);
 
-            //TODO floodfill ores and make cliffs
+            //TODO make cliffs
 
-            //testing
             OreType oreType = ores[Random.Range(1, ores.Count) - 1].type;
 
             FloodFillOres(roundedPoint.x, roundedPoint.y, oreType);
         }
     }
 
-    private RuleTile GetOreRuleTile(OreType oreType) => oresD[oreType];
-
     void FloodFillOres(int x, int y, OreType oreType)
     {
         // Stop if out of bounds, chance of spawning less then needed or already filled
-        if (!IsOnMap(x,y) ||
-            oreMap[x, y] != OreType.None ||
+        if (!IsOnMap(x, y) ||
+            grid[x, y].oreType != OreType.None ||
             Random.Range(0.0f, 1.0f) < mapSettings.oreFieldSize)
         {
             return;
         }
 
         // Fill the current cell wit ore
-        oreMap[x, y] = oreType;
-        propsRocksTileMap.SetTile(new Vector3Int(x, y), GetOreRuleTile(oreType));
+        grid[x, y].oreType = oreType;
+        propsRocksTileMap.SetTile(new Vector3Int(x, y), oresD[oreType]);
 
         // Recursively fill in 4 directions
         FloodFillOres(x + 1, y, oreType);
