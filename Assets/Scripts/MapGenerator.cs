@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Debug = UnityEngine.Debug;
@@ -288,5 +287,5 @@ public class MapGenerator : Singleton<MapGenerator>
         return points;
     }
 
-    public bool IsOnMap(float x, float y) => x >= 0 || x <= mapSize || y >= 0 || y <= mapSize;
+    public bool IsOnMap(int x, int y) => x >= 0 && x < mapSize && y >= 0 && y < mapSize;
 }

@@ -16,7 +16,7 @@ public class Bullet : MonoBehaviour
     {
         m_transform.position += velocity;
 
-        if (MapGenerator.instance.IsOnMap(m_transform.position.x, m_transform.position.y)) Death(true);
+        if (MapGenerator.instance.IsOnMap((int)m_transform.position.x, (int)m_transform.position.y)) Death(true);
     }
 
     private protected virtual void Death(bool force = false)
