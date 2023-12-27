@@ -19,19 +19,14 @@ public class MapGenerator : Singleton<MapGenerator>
     public Tilemap propsRocksTileMap;
     public List<RuleTile> ruleTiles;
 
+    private RuleTile waterTile; //this ruletile contains the water or lava ruletile which determines is the TileHeightType -> Water ?
+
     [Tooltip("Seeds for map generation. dsqIterations count and seed count must be qual!")] public List<Vector2> seeds;
 
     [SerializeField] private Texture2D mapTexture;
 
-    [Flags]
     [Serializable]
-    public enum TileHeightType : byte
-    {
-        None = 0,
-        Ground = 1 << 0,
-        Water = 1 << 1,
-        Cliff = 1 << 2,
-    }
+    public enum TileHeightType : byte { Ground, Water, Cliff }
 
     [Serializable]
     public struct Ore
@@ -86,8 +81,9 @@ public class MapGenerator : Singleton<MapGenerator>
         Stopwatch stopwatch = new Stopwatch();
         stopwatch.Start();
         //TODO -> job
-        Generate();
         InitializeOres();
+        InitRuleTiles();
+        Generate();
         stopwatch.Stop();
         Debug.Log($"Generate time -> {stopwatch.ElapsedMilliseconds} ms");
         stopwatch.Reset();
@@ -128,6 +124,9 @@ public class MapGenerator : Singleton<MapGenerator>
                 int tileIndex = (int)(grid[x, y].height * (ruleTiles.Count - 1));
 
                 terrainTileMap.SetTile(position, ruleTiles[tileIndex]);
+
+                if (ruleTiles[tileIndex] == waterTile) grid[x, y].heightType = TileHeightType.Water;
+                //if (ruleTiles[tileIndex] == cliffTile) grid[x, y].heightType = TileHeightType.Cliff; //TODO cliff generation
             }
         }
     }
@@ -178,6 +177,11 @@ public class MapGenerator : Singleton<MapGenerator>
         oresD = new Dictionary<OreType, RuleTile>(ores.Count);
 
         ores.ForEach(ore => oresD.Add(ore.type, ore.tile));
+    }
+
+    private void InitRuleTiles()
+    {
+        ruleTiles.ForEach(tile => { if (tile.name.Contains("Water") || tile.name.Contains("Lava")) waterTile = tile; });
     }
 
     private void GenerateOresAndCliffs()
