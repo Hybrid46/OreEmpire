@@ -75,7 +75,9 @@ public class MapGenerator : Singleton<MapGenerator>
     }
 
     public List<Ore> ores;
-    public Dictionary<OreType, RuleTile> oresD;
+    public Dictionary<OreType, RuleTile> oreTileLUT;
+
+    public TransportManager transportManager;
 
     void Start()
     {
@@ -106,6 +108,17 @@ public class MapGenerator : Singleton<MapGenerator>
         stopwatch.Stop();
         Debug.Log($"GenerateOresAndCliffs time -> {stopwatch.ElapsedMilliseconds} ms");
         stopwatch.Reset();
+
+        stopwatch.Start();
+        InitializeTransportManager();
+        stopwatch.Stop();
+        Debug.Log($"InitializeTransportManager time -> {stopwatch.ElapsedMilliseconds} ms");
+        stopwatch.Reset();
+    }
+
+    private void Update()
+    {
+        transportManager.UpdateTransporters(Camera.main, Vector2Int.zero, new Vector2Int(mapSize, mapSize));
     }
 
     private void Generate()
@@ -175,15 +188,17 @@ public class MapGenerator : Singleton<MapGenerator>
 
     private void InitializeOres()
     {
-        oresD = new Dictionary<OreType, RuleTile>(ores.Count);
+        oreTileLUT = new Dictionary<OreType, RuleTile>(ores.Count);
 
-        ores.ForEach(ore => oresD.Add(ore.type, ore.tile));
+        ores.ForEach(ore => oreTileLUT.Add(ore.type, ore.tile));
     }
 
     private void InitRuleTiles()
     {
         ruleTiles.ForEach(tile => { if (tile.name.Contains("Water") || tile.name.Contains("Lava")) waterTile = tile; });
     }
+
+    private void InitializeTransportManager() => transportManager = new TransportManager();
 
     private void GenerateOresAndCliffs()
     {
@@ -213,7 +228,7 @@ public class MapGenerator : Singleton<MapGenerator>
 
         // Fill the current cell wit ore
         grid[x, y].oreType = oreType;
-        propsRocksTileMap.SetTile(new Vector3Int(x, y), oresD[oreType]);
+        propsRocksTileMap.SetTile(new Vector3Int(x, y), oreTileLUT[oreType]);
 
         // Recursively fill in 4 directions
         FloodFillOres(x + 1, y, oreType);
