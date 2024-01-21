@@ -18,8 +18,6 @@ public class CameraController : MonoBehaviour
     {
         // Camera zoom with the middle mouse wheel
         float scrollWheel = Input.GetAxis("Mouse ScrollWheel");
-        m_Camera.orthographicSize = Mathf.Max(1f, m_Camera.orthographicSize - scrollWheel * zoomSpeed);
-
         // Camera movement
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
@@ -28,10 +26,10 @@ public class CameraController : MonoBehaviour
         m_Transform.Translate(moveDirection * moveSpeed * Time.deltaTime);
 
         // Clamp camera position to prevent it from going off indefinitely
-        float cameraSize = m_Camera.orthographicSize * m_Camera.aspect;
         float xClamp = Mathf.Clamp(m_Transform.position.x, 0, MapGenerator.instance.mapSize);
-        float yClamp = Mathf.Clamp(m_Transform.position.y, 0, MapGenerator.instance.mapSize);
+        float yClamp = Mathf.Clamp(m_Transform.position.y - scrollWheel * zoomSpeed, 1f, 80f);
+        float zClamp = Mathf.Clamp(m_Transform.position.z, 0, MapGenerator.instance.mapSize);
 
-        m_Transform.position = new Vector3(xClamp, yClamp, m_Transform.position.z);
+        m_Transform.position = new Vector3(xClamp, yClamp, zClamp);
     }
 }
