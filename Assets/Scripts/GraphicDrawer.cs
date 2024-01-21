@@ -134,4 +134,16 @@ public class GraphicDrawer : Singleton<GraphicDrawer>
             return true;
         }
     }
+
+    private void OnDrawGizmos()
+    {
+        drawInstances.ForEach(drawData =>
+        {
+            drawData.positions.ForEach(position =>
+            {
+                Vector3 pos = Matrix4x4GetPosition(position);
+                Gizmos.DrawCube(pos, Vector3.one);
+            });
+        });
+    }
 }

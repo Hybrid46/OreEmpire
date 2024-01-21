@@ -33,13 +33,13 @@ public static class StaticUtils
 
     public static Vector3 MouseToWorldPosition() => Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-    public static Vector2 MouseToGridPosition(Camera camera)
+    public static Vector3Int MouseToGridPosition()
     {
-        Vector3 mouseWorld = camera.ScreenToWorldPoint(Input.mousePosition);
-        Vector2 roundedPosition = new Vector2((int)mouseWorld.x, (int)mouseWorld.y);
+        Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3Int roundedPosition = new Vector3Int((int)mouseWorld.x, 0, (int)mouseWorld.z);
 
         return roundedPosition;
-    }    
+    }
 
     public static Vector3 Snap(Vector3 pos, int v)
     {
@@ -221,17 +221,17 @@ public static class StaticUtils
     }
 
     //Builds 2D MxM matrix pattern, size based
-    public static Vector2Int[] GetPattern(int sizeX, int SizeY)
+    public static Vector3Int[] GetPattern(int sizeX, int SizeZ)
     {
-        Vector2Int[] pattern = new Vector2Int[sizeX * SizeY];
+        Vector3Int[] pattern = new Vector3Int[sizeX * SizeZ];
 
         int index = 0;
 
-        for (int y = 0; y < SizeY; y++)
+        for (int z = 0; z < SizeZ; z++)
         {
             for (int x = 0; x < sizeX; x++)
             {
-                pattern[index] = new Vector2Int(x, y);
+                pattern[index] = new Vector3Int(x, 0, z);
                 index++;
             }
         }

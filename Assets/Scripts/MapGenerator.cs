@@ -9,7 +9,6 @@ using Random = UnityEngine.Random;
 public class MapGenerator : Singleton<MapGenerator>
 {
     public Camera m_camera;
-    public GameObject mousePointer;
 
     [Range(32, 1024)] public int mapSize = 256;
     [Range(0.0f, 1.0f)][Tooltip("Terrain roughness. Higher numbers gives more randomness.")] public float terrainRoughness = 1.0f;
@@ -20,6 +19,7 @@ public class MapGenerator : Singleton<MapGenerator>
 
     public Tilemap terrainTileMap;
     public Tilemap propsRocksTileMap;
+    public Tilemap buildingsTileMap;
     public List<RuleTile> ruleTiles;
 
     private RuleTile waterTile; //this ruletile contains the water or lava ruletile which determines is the TileHeightType -> Water ?
@@ -37,7 +37,6 @@ public class MapGenerator : Singleton<MapGenerator>
         public OreType type;
         public RuleTile tile;
         public Sprite sprite;
-        public GameObject prefab;
         public Material material;
     }
 
@@ -125,9 +124,7 @@ public class MapGenerator : Singleton<MapGenerator>
 
     private void Update()
     {
-        transportManager.UpdateTransporters(m_camera, Vector2Int.zero, new Vector2Int(999999, 999999));
-
-        mousePointer.transform.position = StaticUtils.MouseToGridPosition(m_camera) + new Vector2(0.5f, 0.5f);
+        transportManager.UpdateTransporters();
     }
 
     private void Generate()
@@ -315,15 +312,16 @@ public class MapGenerator : Singleton<MapGenerator>
         return points;
     }
 
-    public bool IsOnMap(int x, int y)
+    public bool IsOnMap(int x, int z)
     {
         if (x < 0 || x >= mapSize) return false;
-        if (y < 0 || y >= mapSize) return false;
+        if (z < 0 || z >= mapSize) return false;
         return true;
     }
 
-    public (int x, int y) WorldToGridPosition(Vector2 position) => (Mathf.Clamp(Mathf.RoundToInt(position.x), 0, mapSize), Mathf.Clamp(Mathf.RoundToInt(position.y), 0, mapSize));
-    public Vector2Int WorldToGridPositionVector(Vector2 position) => new Vector2Int(Mathf.Clamp(Mathf.RoundToInt(position.x),0,mapSize), Mathf.Clamp(Mathf.RoundToInt(position.y), 0, mapSize));
-
-
+    private void OnDrawGizmos()
+    {
+        //Gizmos.color = new Color(1f, 1f, 1f, 0.25f);
+        //Gizmos.DrawCube(StaticUtils.MouseToGridPosition(Camera.main), Vector3.one);
+    }
 }

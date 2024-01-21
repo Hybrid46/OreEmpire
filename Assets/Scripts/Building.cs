@@ -14,55 +14,49 @@ public class Building : MonoBehaviour
         {
             Build(buildings[2]);
 
-            Vector3 mousePos = StaticUtils.MouseToWorldPosition();
-            mousePos.z = 0;
-            Vector3Int roundedPosition = Vector3Int.RoundToInt(mousePos);
-            MapGenerator.instance.transportManager.AddTransporter(new Vector2Int(roundedPosition.x, roundedPosition.y), Vector2Int.right, 2.0f);
+            Vector3Int roundedPosition = StaticUtils.MouseToGridPosition();
+            MapGenerator.instance.transportManager.AddTransporter(roundedPosition, Vector3.right, 2.0f);
         }
 
         //add ore test
         if (Input.GetKeyUp(KeyCode.O))
         {
-            Vector3 mousePos = StaticUtils.MouseToWorldPosition();
-            mousePos.z = 0;
-            Vector3Int roundedPosition = Vector3Int.RoundToInt(mousePos);
+            Vector3Int roundedPosition = StaticUtils.MouseToGridPosition();
 
-            MapGenerator.instance.transportManager.transportBelts[roundedPosition.x, roundedPosition.y].AddOre(MapGenerator.OreType.Copper, 0);
+            MapGenerator.instance.transportManager.transportBelts[roundedPosition.x, roundedPosition.z].AddOre(MapGenerator.OreType.Copper, 0);
         }
     }
 
-    private void Build(GameObject building, int sizeX = 1, int sizeY = 1)
+    private void Build(GameObject building, int sizeX = 1, int sizeZ = 1)
     {
-        Vector3 mousePos = StaticUtils.MouseToWorldPosition();
-        mousePos.z = 0;
-        Vector3Int roundedPosition = Vector3Int.RoundToInt(mousePos);
+        Vector3Int roundedPosition = StaticUtils.MouseToGridPosition();
 
-        if (IsBuildeable(roundedPosition.x, roundedPosition.y, sizeX, sizeY))
+        if (IsBuildeable(roundedPosition.x, roundedPosition.z, sizeX, sizeZ))
         {
-            Instantiate(building, roundedPosition, Quaternion.identity);
-            Vector2Int[] gridsBuilded = StaticUtils.GetPattern(sizeX, sizeY);
+            Instantiate(building, roundedPosition, transform.rotation);
+            Vector3Int[] gridsBuilded = StaticUtils.GetPattern(sizeX, sizeZ);
 
-            foreach (Vector2Int gridBuilded in gridsBuilded)
+            foreach (Vector3Int gridBuilded in gridsBuilded)
             {
-                MapGenerator.instance.grid[gridBuilded.x, gridBuilded.y].built = true;
+                MapGenerator.instance.grid[gridBuilded.x, gridBuilded.z].built = true;
             }
         }
     }
 
-    private bool IsBuildeable(int PosX, int PosY, int sizeX, int sizeY)
+    private bool IsBuildeable(int PosX, int PosZ, int sizeX, int sizeZ)
     {
         //TODO resource check
 
-        for (int y = 0; y < sizeY; y++)
+        for (int z = 0; z < sizeZ; z++)
         {
             for (int x = 0; x < sizeX; x++)
             {
                 //Is in map?
-                if (MapGenerator.instance.IsOnMap(PosX + x, PosY + y) == false) return false;
+                if (MapGenerator.instance.IsOnMap(PosX + x, PosZ + z) == false) return false;
                 //Is building on ground?
-                if (MapGenerator.instance.grid[PosX + x, PosY + y].heightType != MapGenerator.TileHeightType.Ground) return false;
+                if (MapGenerator.instance.grid[PosX + x, PosZ + z].heightType != MapGenerator.TileHeightType.Ground) return false;
                 //Is it already built there?
-                if (MapGenerator.instance.grid[PosX + x, PosY + y].built == true) return false;
+                if (MapGenerator.instance.grid[PosX + x, PosZ + z].built == true) return false;
             }
         }
 
