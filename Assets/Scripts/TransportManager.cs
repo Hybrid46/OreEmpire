@@ -73,6 +73,8 @@ public class TransportManager
     {
         transporterPositions.Add(position);
         transportBelts[position.x, position.y].Set(direction, speed);
+
+        Debug.Log($"Transporter added! pos -> {position} dir -> {direction} speed -> {speed}");
     }
 
     public void RemoveTransporter(Vector2Int position)
@@ -105,7 +107,7 @@ public class TransportManager
                 //draw ore if visible
                 if (IsTransporterVisible(transporterPosition, minVisibleTile, maxVisibleTile))
                 {
-                    DrawTransporterOre(camera, transportBelts[transporterPosition.x, transporterPosition.y].ores[index], orePosition);
+                    DrawTransporterOre(transportBelts[transporterPosition.x, transporterPosition.y].ores[index], orePosition);
                 }
 
                 //increase interpolation -> move ore on belt
@@ -141,13 +143,10 @@ public class TransportManager
         }
     }
 
-    private void DrawTransporterOre(Camera camera, OreType oreType, Vector2 orePosition)
+    private void DrawTransporterOre(OreType oreType, Vector2 orePosition)
     {
-        Rect rect = new Rect(camera.WorldToScreenPoint(orePosition), Vector2.one * 32.0f);
-
-        Graphics.DrawTexture(rect, MapGenerator.instance.oreTileLUT[oreType].m_DefaultSprite.texture);
+        GraphicDrawer.instance.AddInstance(MapGenerator.instance.oreMaterialLUT[oreType], orePosition);
     }
-
     private bool IsTransporterVisible(Vector2Int transporterPosition, Vector2Int minVisibleTile, Vector2Int maxVisibleTile) => transporterPosition.x >= minVisibleTile.x && transporterPosition.x <= maxVisibleTile.x &&
                                                                                                                                transporterPosition.y >= minVisibleTile.y && transporterPosition.y <= maxVisibleTile.y;
 }

@@ -29,11 +29,9 @@ public class CameraController : MonoBehaviour
 
         // Clamp camera position to prevent it from going off indefinitely
         float cameraSize = m_Camera.orthographicSize * m_Camera.aspect;
-        float xClamp = Mathf.Clamp(m_Transform.position.x, -cameraSize, cameraSize);
-        float yClamp = Mathf.Clamp(m_Transform.position.y, -m_Camera.orthographicSize, m_Camera.orthographicSize);
+        float xClamp = Mathf.Clamp(m_Transform.position.x, 0, MapGenerator.instance.mapSize);
+        float yClamp = Mathf.Clamp(m_Transform.position.y, 0, MapGenerator.instance.mapSize);
 
         m_Transform.position = new Vector3(xClamp, yClamp, m_Transform.position.z);
-
-        //TODO: keep the camera inside world bounds
     }
 }

@@ -33,6 +33,14 @@ public static class StaticUtils
 
     public static Vector3 MouseToWorldPosition() => Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
+    public static Vector2 MouseToGridPosition(Camera camera)
+    {
+        Vector3 mouseWorld = camera.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 roundedPosition = new Vector2((int)mouseWorld.x, (int)mouseWorld.y);
+
+        return roundedPosition;
+    }    
+
     public static Vector3 Snap(Vector3 pos, int v)
     {
         float x = pos.x;

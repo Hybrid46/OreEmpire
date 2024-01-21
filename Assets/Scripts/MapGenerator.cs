@@ -8,6 +8,9 @@ using Random = UnityEngine.Random;
 
 public class MapGenerator : Singleton<MapGenerator>
 {
+    public Camera m_camera;
+    public GameObject mousePointer;
+
     [Range(32, 1024)] public int mapSize = 256;
     [Range(0.0f, 1.0f)][Tooltip("Terrain roughness. Higher numbers gives more randomness.")] public float terrainRoughness = 1.0f;
     [Range(1.0f, 100.0f)][Tooltip("Terrain micro roughness. Higher numbers gives more micro randomness.")] public float terrainMicroRoughness = 10.0f;
@@ -27,13 +30,15 @@ public class MapGenerator : Singleton<MapGenerator>
 
     [Serializable] public enum TileHeightType : byte { Ground, Water, Cliff }
     [Serializable] public enum MapType { Summer, Winter, DeepOcean }
-    [Serializable] public enum TransportDirection { None, Up, Down, Right, Left } //TODO for ore transportation belts -> should I use this with a dictionary O(1+hash) instead of a switch O(1-4)?
 
     [Serializable]
     public struct Ore
     {
         public OreType type;
         public RuleTile tile;
+        public Sprite sprite;
+        public GameObject prefab;
+        public Material material;
     }
 
     [Serializable]
@@ -75,7 +80,9 @@ public class MapGenerator : Singleton<MapGenerator>
     }
 
     public List<Ore> ores;
+    public Dictionary<OreType, Material> oreMaterialLUT;
     public Dictionary<OreType, RuleTile> oreTileLUT;
+    public Dictionary<OreType, Sprite> oreBarLUT;
 
     public TransportManager transportManager;
 
@@ -118,7 +125,9 @@ public class MapGenerator : Singleton<MapGenerator>
 
     private void Update()
     {
-        transportManager.UpdateTransporters(Camera.main, Vector2Int.zero, new Vector2Int(mapSize, mapSize));
+        transportManager.UpdateTransporters(m_camera, Vector2Int.zero, new Vector2Int(999999, 999999));
+
+        mousePointer.transform.position = StaticUtils.MouseToGridPosition(m_camera) + new Vector2(0.5f, 0.5f);
     }
 
     private void Generate()
@@ -189,8 +198,15 @@ public class MapGenerator : Singleton<MapGenerator>
     private void InitializeOres()
     {
         oreTileLUT = new Dictionary<OreType, RuleTile>(ores.Count);
+        oreBarLUT = new Dictionary<OreType, Sprite>(ores.Count);
+        oreMaterialLUT = new Dictionary<OreType, Material>(ores.Count);
 
-        ores.ForEach(ore => oreTileLUT.Add(ore.type, ore.tile));
+        ores.ForEach(ore =>
+        {
+            oreTileLUT.Add(ore.type, ore.tile);
+            oreBarLUT.Add(ore.type, ore.sprite);
+            oreMaterialLUT.Add(ore.type, ore.material);
+        });
     }
 
     private void InitRuleTiles()
@@ -305,4 +321,9 @@ public class MapGenerator : Singleton<MapGenerator>
         if (y < 0 || y >= mapSize) return false;
         return true;
     }
+
+    public (int x, int y) WorldToGridPosition(Vector2 position) => (Mathf.Clamp(Mathf.RoundToInt(position.x), 0, mapSize), Mathf.Clamp(Mathf.RoundToInt(position.y), 0, mapSize));
+    public Vector2Int WorldToGridPositionVector(Vector2 position) => new Vector2Int(Mathf.Clamp(Mathf.RoundToInt(position.x),0,mapSize), Mathf.Clamp(Mathf.RoundToInt(position.y), 0, mapSize));
+
+
 }

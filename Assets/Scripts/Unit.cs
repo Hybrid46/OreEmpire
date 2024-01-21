@@ -1,4 +1,5 @@
 using UnityEngine;
+using OreType = MapGenerator.OreType;
 
 public class Unit : MonoBehaviour
 {
@@ -10,9 +11,11 @@ public class Unit : MonoBehaviour
 
     private protected int oreContain;               // how much ore it can contain
     private protected bool Miner;                   // is miner?
-    private protected MapGenerator.OreType oreType; // the type of ore for mining
+    private protected OreType oreType; // the type of ore for mining
     private protected float minerState;             // actual state of mining -> when 1 it finishes mining ore
     private protected float minerSpeed;             // mining speed
+
+    private protected bool store; // can store resources?
 
     void Start()
     {
