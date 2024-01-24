@@ -107,7 +107,7 @@ public class TransportManager
                 //draw ore if visible
                 //if (IsTransporterVisible(transporterPosition, minVisibleTile, maxVisibleTile))
                 //{
-                    DrawTransporterOre(transportBelts[transporterPosition.x, transporterPosition.z].ores[index], orePosition);
+                DrawTransporterOre(transportBelts[transporterPosition.x, transporterPosition.z].ores[index], orePosition);
                 //}
 
                 //increase interpolation -> move ore on belt
@@ -145,6 +145,6 @@ public class TransportManager
 
     private void DrawTransporterOre(OreType oreType, Vector3 orePosition)
     {
-        GraphicDrawer.instance.AddInstance(MapGenerator.instance.oreMaterialLUT[oreType], orePosition);
+        GraphicDrawer.instance.AddInstance(MapGenerator.instance.oreMaterialLUT[oreType], orePosition, Quaternion.Euler(90, 0, 0), Vector3.one);
     }
 }

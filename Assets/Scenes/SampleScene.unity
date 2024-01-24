@@ -564,9 +564,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   drawMesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
   drawInstances: []
-  renderBoundingBox:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0, y: 0, z: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0

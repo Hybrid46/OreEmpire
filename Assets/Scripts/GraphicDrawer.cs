@@ -1,94 +1,45 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class GraphicDrawer : Singleton<GraphicDrawer>
 {
     public Mesh drawMesh;
-    [SerializeField] private List<DrawData> drawInstances;
-    private Dictionary<Material, DrawData> drawInstancesLUT;
-
-    [SerializeField, HideInInspector] private Bounds renderBoundingBox; // All TRS's bounds
-
-    [SerializeField] private ComputeBuffer meshPropertiesBuffer;
-    [SerializeField] private ComputeBuffer argsBuffer;
-
-    [Serializable]
-    public struct DrawData
-    {
-        public Material drawMaterial;
-        public List<Matrix4x4> positions;
-
-        public DrawData(Material drawMaterial, List<Matrix4x4> positions)
-        {
-            this.drawMaterial = drawMaterial;
-            this.positions = positions;
-        }
-    }
+    private Dictionary<Material, List<Matrix4x4>> drawData;
 
     void Start()
     {
-        drawInstancesLUT = new Dictionary<Material, DrawData>(drawInstances.Count);
-
-        drawInstances.ForEach(drawSprite =>
-        {
-            if (!drawInstancesLUT.ContainsKey(drawSprite.drawMaterial)) drawInstancesLUT.Add(drawSprite.drawMaterial, drawSprite);
-        });
+        drawData = new Dictionary<Material, List<Matrix4x4>>();
     }
 
     void Update()
     {
-        DrawInstances();
+        DrawMeshes();
     }
 
-    private void DrawInstances()
+    private void DrawMeshes()
     {
-        drawInstances.ForEach(drawData =>
+        foreach (KeyValuePair<Material, List<Matrix4x4>> draw in drawData)
         {
-            if (AreComputeBuffersInitialized()) DisposeComputeBuffers();
-            renderBoundingBox = new Bounds(Vector3.zero, new Vector3(10f, 10f, 10f));
+            //Debug.Log($"drawData Material -> {drawData.drawMaterial.name} TRS count -> {drawData.TRSs.Count}");
 
-            int population = drawData.positions.Count;
+            RenderParams rp = new RenderParams(draw.Key);
 
-            MaterialPropertyBlock mpb = new MaterialPropertyBlock();
-            mpb.SetBuffer("_DrawData", meshPropertiesBuffer);
+            for (int d = 0; d < draw.Value.Count; d++)
+            {
+                Graphics.RenderMesh(rp, drawMesh, 0, draw.Value[d]);
+            }
 
-            //Args buffer initialization
-            uint[] args = new uint[5] { 0, 0, 0, 0, 0 };
-            args[0] = (uint)drawMesh.GetIndexCount(0);
-            args[1] = (uint)population;
-            args[2] = (uint)drawMesh.GetIndexStart(0);
-            args[3] = (uint)drawMesh.GetBaseVertex(0);
-            argsBuffer = new ComputeBuffer(1, args.Length * sizeof(uint), ComputeBufferType.IndirectArguments);
-            argsBuffer.SetData(args);
-
-            //Fill the compute buffer which transporting the TRS matrices
-            meshPropertiesBuffer = new ComputeBuffer(population, sizeof(float) * 4 * 4);  //Marshal.SizeOf<DrawData.positions>()
-            meshPropertiesBuffer.SetData(drawData.positions.ToArray());
-            drawData.drawMaterial.SetBuffer("_DrawData", meshPropertiesBuffer);
-
-            Graphics.DrawMeshInstancedIndirect(drawMesh, 0, drawData.drawMaterial, renderBoundingBox, argsBuffer, 0, mpb, ShadowCastingMode.Off, false, gameObject.layer, null, LightProbeUsage.Off, null);
-
-            drawData.positions.Clear();
-        });
-    }
-
-    public void AddInstance(Material material, Vector3 position) => AddInstance(material, position, Vector3.one);
-
-    public void AddInstance(Material material, Vector3 position, Vector3 scale)
-    {
-        Matrix4x4 TRS = Matrix4x4.identity;
-        Matrix4x4SetPosition(ref TRS, position);
-        Matrix4x4SetScale(ref TRS, scale);
-
-        if (!drawInstancesLUT.ContainsKey(material))
-        {
-            drawInstances.Add(new DrawData(material, new List<Matrix4x4>()));
-            drawInstancesLUT.Add(material, drawInstances[drawInstances.Count - 1]);
+            draw.Value.Clear();
         }
+    }
 
-        drawInstancesLUT[material].positions.Add(TRS);
+    public void AddInstance(Material material, Vector3 position, Quaternion rotation, Vector3 scale)
+    {
+        Matrix4x4 TRS = Matrix4x4.TRS(position, rotation, scale);
+
+        if (!drawData.ContainsKey(material)) drawData.Add(material, new List<Matrix4x4>());
+
+        drawData[material].Add(TRS);
     }
 
     private Vector3 Matrix4x4GetPosition(Matrix4x4 m) => new Vector3(m[0, 3], m[1, 3], m[2, 3]);
@@ -103,47 +54,20 @@ public class GraphicDrawer : Singleton<GraphicDrawer>
 
     private bool IsLayerRendered(Camera camera, int layer) => ((camera.cullingMask & (1 << layer)) != 0);
 
-    private void OnDisable()
-    {
-        DisposeComputeBuffers();
-    }
-
-    private void OnDestroy()
-    {
-        DisposeComputeBuffers();
-    }
-
-    private void DisposeComputeBuffers()
-    {
-        if (meshPropertiesBuffer != null) meshPropertiesBuffer.Release();
-        meshPropertiesBuffer = null;
-
-        if (argsBuffer != null) argsBuffer.Release();
-        argsBuffer = null;
-    }
-
-    private bool AreComputeBuffersInitialized()
-    {
-        if (argsBuffer == null || meshPropertiesBuffer == null ||
-            argsBuffer.count == 0 || meshPropertiesBuffer.count == 0)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
-    }
-
     private void OnDrawGizmos()
     {
-        drawInstances.ForEach(drawData =>
+        if (drawData == null || drawData.Count == 0) return;
+
+        Gizmos.color = new Color(0f, 1f, 1f, 1f);
+
+        foreach (KeyValuePair<Material, List<Matrix4x4>> draw in drawData)
         {
-            drawData.positions.ForEach(position =>
+            draw.Value.ForEach(trs =>
             {
-                Vector3 pos = Matrix4x4GetPosition(position);
+                Vector3 pos = Matrix4x4GetPosition(trs);
                 Gizmos.DrawCube(pos, Vector3.one);
+                Gizmos.DrawWireCube(pos, Vector3.one);
             });
-        });
+        }
     }
 }
