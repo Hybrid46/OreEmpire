@@ -35,8 +35,10 @@ public static class StaticUtils
 
     public static Vector3Int MouseToGridPosition()
     {
-        Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector3Int roundedPosition = new Vector3Int((int)mouseWorld.x, 0, (int)mouseWorld.z);
+        Vector3 mousePosition = Input.mousePosition;
+        mousePosition.z = Camera.main.nearClipPlane + 1f;
+        Vector3 mouseWorld = Camera.main.ScreenToWorldPoint(mousePosition);
+        Vector3Int roundedPosition = Vector3Int.RoundToInt(mouseWorld);
 
         return roundedPosition;
     }
@@ -209,7 +211,7 @@ public static class StaticUtils
             {
                 Vector3 currentPos = new Vector3(x, 0.0f, y);
 
-                if (currentPos == Vector3.zero) continue; //we must skip the center point because the IDW on 0 zero distance will cause some problem -> zero distance weight will be extra powerful and division by zero!
+                if (currentPos == Vector3.zero) continue;
 
                 if (Vector3.Distance(Vector3.zero, currentPos) <= range) pattern.Add(currentPos);
             }

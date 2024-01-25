@@ -4,6 +4,7 @@ public class CameraController : MonoBehaviour
 {
     public float moveSpeed = 5f;
     public float zoomSpeed = 5f;
+    private readonly (float min, float max) minMaxOrthoSize = (5f, 100f);
 
     private Camera m_Camera;
     private Transform m_Transform;
@@ -27,9 +28,9 @@ public class CameraController : MonoBehaviour
 
         // Clamp camera position to prevent it from going off indefinitely
         float xClamp = Mathf.Clamp(m_Transform.position.x, 0, MapGenerator.instance.mapSize);
-        float yClamp = Mathf.Clamp(m_Transform.position.y - scrollWheel * zoomSpeed, 1f, 80f);
+        m_Camera.orthographicSize = Mathf.Clamp(m_Camera.orthographicSize - scrollWheel * zoomSpeed, minMaxOrthoSize.min, minMaxOrthoSize.max);
         float zClamp = Mathf.Clamp(m_Transform.position.z, 0, MapGenerator.instance.mapSize);
 
-        m_Transform.position = new Vector3(xClamp, yClamp, zClamp);
+        m_Transform.position = new Vector3(xClamp, 1f, zClamp);
     }
 }
