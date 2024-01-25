@@ -4,11 +4,11 @@ using UnityEngine;
 public class GraphicDrawer : Singleton<GraphicDrawer>
 {
     public Mesh drawMesh;
-    private Dictionary<Material, List<Matrix4x4>> drawData;
+    private Dictionary<Material, Stack<Matrix4x4>> drawData;
 
     void Start()
     {
-        drawData = new Dictionary<Material, List<Matrix4x4>>();
+        drawData = new Dictionary<Material, Stack<Matrix4x4>>();
     }
 
     void Update()
@@ -18,18 +18,16 @@ public class GraphicDrawer : Singleton<GraphicDrawer>
 
     private void DrawMeshes()
     {
-        foreach (KeyValuePair<Material, List<Matrix4x4>> draw in drawData)
+        foreach (KeyValuePair<Material, Stack<Matrix4x4>> draw in drawData)
         {
             //Debug.Log($"drawData Material -> {drawData.drawMaterial.name} TRS count -> {drawData.TRSs.Count}");
 
             RenderParams rp = new RenderParams(draw.Key);
 
-            for (int d = 0; d < draw.Value.Count; d++)
-            {
-                Graphics.RenderMesh(rp, drawMesh, 0, draw.Value[d]);
+            while(draw.Value.Count > 0)
+            {            
+                Graphics.RenderMesh(rp, drawMesh, 0, draw.Value.Pop());
             }
-
-            draw.Value.Clear();
         }
     }
 
@@ -37,9 +35,9 @@ public class GraphicDrawer : Singleton<GraphicDrawer>
     {
         Matrix4x4 TRS = Matrix4x4.TRS(position, rotation, scale);
 
-        if (!drawData.ContainsKey(material)) drawData.Add(material, new List<Matrix4x4>());
+        if (!drawData.ContainsKey(material)) drawData.Add(material, new Stack<Matrix4x4>());
 
-        drawData[material].Add(TRS);
+        drawData[material].Push(TRS);
     }
 
     private Vector3 Matrix4x4GetPosition(Matrix4x4 m) => new Vector3(m[0, 3], m[1, 3], m[2, 3]);
@@ -52,22 +50,8 @@ public class GraphicDrawer : Singleton<GraphicDrawer>
 
     private Matrix4x4 GetTransformTRSMatrix(Transform transform) => Matrix4x4.TRS(transform.localPosition, transform.localRotation, transform.localScale);
 
+    private Bounds TRSToBounds(Matrix4x4 TRS) => new Bounds(Matrix4x4GetPosition(TRS), Matrix4x4GetScale(TRS));
+
     private bool IsLayerRendered(Camera camera, int layer) => ((camera.cullingMask & (1 << layer)) != 0);
 
-    private void OnDrawGizmos()
-    {
-        if (drawData == null || drawData.Count == 0) return;
-
-        Gizmos.color = new Color(0f, 1f, 1f, 1f);
-
-        foreach (KeyValuePair<Material, List<Matrix4x4>> draw in drawData)
-        {
-            draw.Value.ForEach(trs =>
-            {
-                Vector3 pos = Matrix4x4GetPosition(trs);
-                Gizmos.DrawCube(pos, Vector3.one);
-                Gizmos.DrawWireCube(pos, Vector3.one);
-            });
-        }
-    }
 }
