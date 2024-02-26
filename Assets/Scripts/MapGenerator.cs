@@ -32,15 +32,6 @@ public class MapGenerator : Singleton<MapGenerator>
     [Serializable] public enum MapType { Summer, Winter, DeepOcean }
 
     [Serializable]
-    public struct Ore
-    {
-        public OreType type;
-        public RuleTile tile;
-        public Sprite sprite;
-        public Material material;
-    }
-
-    [Serializable]
     public struct GridCell
     {
         public float height;

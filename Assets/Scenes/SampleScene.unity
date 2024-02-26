@@ -530,10 +530,7 @@ MonoBehaviour:
     oreFieldSpacing: 10
     cliffContinuity: 0.3
   ores:
-  - type: 1
-    tile: {fileID: 11400000, guid: 3ac03f1c366ad9340a1f916396cc57ed, type: 2}
-    sprite: {fileID: 21300000, guid: 388262c4fdebcac4dbf130ed7a0147ee, type: 3}
-    material: {fileID: 2100000, guid: d5f0a226761aa1948a8f230bcf8203e2, type: 2}
+  - {fileID: 11400000, guid: 0d4f62da31222854d8099a9b917550e6, type: 2}
 --- !u!114 &465448281
 MonoBehaviour:
   m_ObjectHideFlags: 0
