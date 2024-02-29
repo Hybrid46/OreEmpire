@@ -26,8 +26,8 @@ public static class MatrixTraversal<T>
     /// <param name="centerX">The x-coordinate of the center. Use -1 to set to the center of the matrix.</param>
     /// <param name="centerY">The y-coordinate of the center. Use -1 to set to the center of the matrix.</param>
     /// <param name="maxDistance">The maximum traversal distance from the center.</param>
-    /// <returns>An array of indexes representing the traversed elements.</returns>
-    public static (int x, int y)[] TraverseMatrixCubic(T[,] matrix, int centerX, int centerY, int maxDistance)
+    /// <returns>A list of indexes representing the traversed elements.</returns>
+    public static List<(int x, int y)> TraverseMatrixCubic(T[,] matrix, int centerX, int centerY, int maxDistance)
     {
         if (centerX == -1) centerX = matrix.GetLength(0) / 2;
         if (centerY == -1) centerY = matrix.GetLength(1) / 2;
@@ -36,10 +36,7 @@ public static class MatrixTraversal<T>
 
         if (maxDistance == -1 || maxDistance > matrixMaximumDistance) maxDistance = matrixMaximumDistance;
 
-        int maxElements = (maxDistance + 1) * (maxDistance * 4 + 1) / 2;
-        (int x, int y)[] indexes = new (int x, int y)[maxElements];
-
-        int index = 0;
+        List<(int x, int y)> indexes = new List<(int x, int y)>();
 
         for (int distance = 0; distance <= maxDistance; distance++)
         {
@@ -47,20 +44,20 @@ public static class MatrixTraversal<T>
             {
                 int x = centerX + i;
                 int y = centerY + distance;
-                if (IsValidIndex(x, y)) indexes[index++] = (x, y);
+                if (IsValidIndex(x, y)) indexes.Add((x, y));
 
                 y = centerY - distance;
-                if (IsValidIndex(x, y)) indexes[index++] = (x, y);
+                if (IsValidIndex(x, y)) indexes.Add((x, y));
             }
 
             for (int j = -distance + 1; j < distance; j++)
             {
                 int x = centerX + distance;
                 int y = centerY + j;
-                if (IsValidIndex(x, y)) indexes[index++] = (x, y);
+                if (IsValidIndex(x, y)) indexes.Add((x, y));
 
                 x = centerX - distance;
-                if (IsValidIndex(x, y)) indexes[index++] = (x, y);
+                if (IsValidIndex(x, y)) indexes.Add((x, y));
             }
         }
 
@@ -79,14 +76,13 @@ public static class MatrixTraversal<T>
     /// <param name="centerX">The x-coordinate of the center. Use -1 to set to the center of the matrix.</param>
     /// <param name="centerY">The y-coordinate of the center. Use -1 to set to the center of the matrix.</param>
     /// <param name="maxDistance">The maximum traversal distance from the center.</param>
-    /// <returns>An array of indexes representing the traversed elements.</returns>
-    public static (int x, int y)[] TraverseMatrixSpiral(T[,] matrix, int centerX, int centerY, int maxDistance)
+    /// <returns>A list of indexes representing the traversed elements.</returns>
+    public static List<(int x, int y)> TraverseMatrixSpiral(T[,] matrix, int centerX, int centerY, int maxDistance)
     {
         if (centerX == -1) centerX = matrix.GetLength(0) / 2;
         if (centerY == -1) centerY = matrix.GetLength(1) / 2;
 
-        int maxElements = (maxDistance * 2 + 1) * (maxDistance * 2 + 1);
-        (int x, int y)[] indexes = new (int x, int y)[maxElements];
+        List<(int x, int y)> indexes = new List<(int x, int y)>();
 
         int x = centerX;
         int y = centerY;
@@ -95,13 +91,12 @@ public static class MatrixTraversal<T>
         int distance = 0;
         int stepsInCurrentDirection = 0;
         int stepsBeforeDirectionChange = 1;
-        int index = 0;
 
         while (distance <= maxDistance)
         {
             if (IsValidIndex(x, y))
             {
-                indexes[index++] = (x, y);
+                indexes.Add((x, y));
             }
 
             x += dx;
@@ -120,9 +115,6 @@ public static class MatrixTraversal<T>
 
             distance = Math.Max(Math.Abs(centerX - x), Math.Abs(centerY - y));
         }
-
-        // Trim the array to remove excess unused elements
-        Array.Resize(ref indexes, index);
 
         return indexes;
 
