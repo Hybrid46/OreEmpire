@@ -1,7 +1,24 @@
 using System;
+using System.Collections.Generic;
 
 public static class MatrixTraversal<T>
 {
+    public enum Direction
+    {
+        Up,
+        Down,
+        Left,
+        Right
+    }
+
+    public enum QuarterDirection
+    {
+        TopLeft,
+        TopRight,
+        BottomLeft,
+        BottomRight
+    }
+
     /// <summary>
     /// Traverse a 2D matrix using a cubic square pattern.
     /// </summary>
@@ -113,5 +130,133 @@ public static class MatrixTraversal<T>
         {
             return x >= 0 && x < matrix.GetLength(0) && y >= 0 && y < matrix.GetLength(1);
         }
+    }
+
+    /// <summary>
+    /// Traverses a 2D matrix from a specified starting point towards a side within a given range.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the matrix.</typeparam>
+    /// <param name="matrix">The 2D matrix to traverse.</param>
+    /// <param name="startX">The starting X-coordinate within the matrix.</param>
+    /// <param name="startY">The starting Y-coordinate within the matrix.</param>
+    /// <param name="direction">The direction towards which to traverse.</param>
+    /// <param name="range">The range of traversal from the starting point.</param>
+    /// <returns>A list of coordinates representing the traversal path.</returns>
+    public static List<(int x, int y)> TraverseToSide(T[,] matrix, int startX, int startY, Direction direction, int range)
+    {
+        List<(int x, int y)> traversalPath = new List<(int x, int y)>();
+
+        int xStep = 0;
+        int yStep = 0;
+
+        // Determine step direction based on the specified direction
+        switch (direction)
+        {
+            case Direction.Up:
+                yStep = -1;
+                break;
+            case Direction.Down:
+                yStep = 1;
+                break;
+            case Direction.Left:
+                xStep = -1;
+                break;
+            case Direction.Right:
+                xStep = 1;
+                break;
+        }
+
+        int currentX = startX;
+        int currentY = startY;
+
+        // Traverse until reaching the boundary of the specified range
+        for (int i = 0; i < range; i++)
+        {
+            // Check if the current position is within the matrix bounds
+            if (currentX >= 0 && currentX < matrix.GetLength(0) &&
+                currentY >= 0 && currentY < matrix.GetLength(1))
+            {
+                traversalPath.Add((currentX, currentY));
+            }
+            else
+            {
+                // If the current position is out of bounds, stop traversal
+                break;
+            }
+
+            // Move to the next position
+            currentX += xStep;
+            currentY += yStep;
+        }
+
+        return traversalPath;
+    }
+
+    /// <summary>
+    /// Traverses a quarter of a 2D matrix within specified ranges on the X and Y axes.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the matrix.</typeparam>
+    /// <param name="matrix">The 2D matrix to traverse.</param>
+    /// <param name="startX">The starting X-coordinate within the matrix.</param>
+    /// <param name="startY">The starting Y-coordinate within the matrix.</param>
+    /// <param name="xRange">The range of traversal on the X-axis.</param>
+    /// <param name="yRange">The range of traversal on the Y-axis.</param>
+    /// <param name="direction">The direction of traversal.</param>
+    /// <returns>A list of coordinates representing the traversal path.</returns>
+    public static List<(int x, int y)> TraverseQuarter<T>(T[,] matrix, int startX, int startY, int xRange, int yRange, QuarterDirection direction)
+    {
+        List<(int x, int y)> traversalPath = new List<(int x, int y)>();
+
+        // Determine the ending coordinates based on the ranges and direction
+        int endX, endY;
+        switch (direction)
+        {
+            case QuarterDirection.TopLeft:
+                endX = Math.Min(startX + xRange, matrix.GetLength(0) - 1);
+                endY = Math.Min(startY + yRange, matrix.GetLength(1) - 1);
+                for (int x = startX; x <= endX; x++)
+                {
+                    for (int y = startY; y <= endY; y++)
+                    {
+                        traversalPath.Add((x, y));
+                    }
+                }
+                break;
+            case QuarterDirection.TopRight:
+                endX = Math.Max(startX - xRange, 0);
+                endY = Math.Min(startY + yRange, matrix.GetLength(1) - 1);
+                for (int x = startX; x >= endX; x--)
+                {
+                    for (int y = startY; y <= endY; y++)
+                    {
+                        traversalPath.Add((x, y));
+                    }
+                }
+                break;
+            case QuarterDirection.BottomLeft:
+                endX = Math.Min(startX + xRange, matrix.GetLength(0) - 1);
+                endY = Math.Max(startY - yRange, 0);
+                for (int x = startX; x <= endX; x++)
+                {
+                    for (int y = startY; y >= endY; y--)
+                    {
+                        traversalPath.Add((x, y));
+                    }
+                }
+                break;
+            case QuarterDirection.BottomRight:
+                endX = Math.Max(startX - xRange, 0);
+                endY = Math.Max(startY - yRange, 0);
+                for (int x = startX; x >= endX; x--)
+                {
+                    for (int y = startY; y >= endY; y--)
+                    {
+                        traversalPath.Add((x, y));
+                    }
+                }
+                break;
+        }
+
+        return traversalPath;
     }
 }
