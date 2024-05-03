@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using OreType = MapGenerator.OreType;
+using ResourceType = ResourceManager.ResourceType;
 
 //This script will manage the belt transport system
 public class TransportManager
@@ -13,14 +13,14 @@ public class TransportManager
     {
         public float speed;
         public Vector3[] directions;
-        public OreType[] ores;
+        public ResourceType[] ores;
         public float[] interpolations;
 
         public Transporter(Vector3 outDirection, float speed)
         {
             this.speed = speed;
             this.directions = new Vector3[2] { Vector3.zero, outDirection };
-            this.ores = new OreType[2] { OreType.None, OreType.None };
+            this.ores = new ResourceType[2] { ResourceType.None, ResourceType.None };
             this.interpolations = new float[2] { 0.0f, 0.0f };
         }
 
@@ -30,7 +30,7 @@ public class TransportManager
             this.speed = speed;
         }
 
-        public void AddOre(OreType oreType, int index)
+        public void AddOre(ResourceType oreType, int index)
         {
             if (!IsLoadable(index))
             {
@@ -44,18 +44,18 @@ public class TransportManager
 
         public void RemoveOre(int index)
         {
-            ores[index] = OreType.None;
+            ores[index] = ResourceType.None;
             interpolations[index] = 0.0f;
         }
 
-        public bool IsLoadable(int index) => ores[index] == OreType.None;
+        public bool IsLoadable(int index) => ores[index] == ResourceType.None;
     }
 
     public TransportManager() => Initialize();
 
     private void Initialize()
     {
-        int mapSize = MapGenerator.instance.mapSize;
+        int mapSize = 512;
 
         transportBelts = new Transporter[mapSize, mapSize];
         transporterPositions = new HashSet<Vector3Int>(mapSize * mapSize);
@@ -97,7 +97,7 @@ public class TransportManager
             for (int index = 0; index < 2; index++)
             {
                 //is transporter empty here?
-                if (transportBelts[transporterPosition.x, transporterPosition.z].ores[index] == OreType.None) continue;
+                if (transportBelts[transporterPosition.x, transporterPosition.z].ores[index] == ResourceType.None) continue;
 
                 Vector3 direction = transportBelts[transporterPosition.x, transporterPosition.z].directions[index];
                 float interpolation = transportBelts[transporterPosition.x, transporterPosition.z].interpolations[index]; //should I invert input when index == 0? -> (0.5f - x)
@@ -121,7 +121,7 @@ public class TransportManager
                     //transfer
                     if (index == 0) //Input to Center
                     {
-                        if (transportBelts[transporterPosition.x, transporterPosition.z].ores[1] == OreType.None)
+                        if (transportBelts[transporterPosition.x, transporterPosition.z].ores[1] == ResourceType.None)
                         {
                             transportBelts[transporterPosition.x, transporterPosition.z].AddOre(transportBelts[transporterPosition.x, transporterPosition.z].ores[index], 1);
                             transportBelts[transporterPosition.x, transporterPosition.z].RemoveOre(index);
@@ -132,7 +132,7 @@ public class TransportManager
                         //if the transport system contains belt in out direction we transfer the ore to it
                         Vector3Int nextPosition = transporterPosition + Vector3Int.RoundToInt(transportBelts[transporterPosition.x, transporterPosition.z].directions[index]);
 
-                        if (transporterPositions.Contains(nextPosition) && transportBelts[nextPosition.x, nextPosition.z].ores[0] == OreType.None)
+                        if (transporterPositions.Contains(nextPosition) && transportBelts[nextPosition.x, nextPosition.z].ores[0] == ResourceType.None)
                         {
                             transportBelts[nextPosition.x, nextPosition.z].AddOre(transportBelts[transporterPosition.x, transporterPosition.z].ores[index], 0);
                             transportBelts[transporterPosition.x, transporterPosition.z].RemoveOre(index);
@@ -143,8 +143,8 @@ public class TransportManager
         }
     }
 
-    private void DrawTransporterOre(OreType oreType, Vector3 orePosition)
+    private void DrawTransporterOre(ResourceType oreType, Vector3 orePosition)
     {
-        GraphicDrawer.instance.AddInstance(MapGenerator.instance.oreMaterialLUT[oreType], orePosition, Quaternion.Euler(90, 0, 0), Vector3.one);
+        GraphicDrawer.instance.AddInstance(GameManager.instance.resourceManager.resourceMaterialLUT[oreType], orePosition, Quaternion.Euler(90, 0, 0), Vector3.one);
     }
 }
