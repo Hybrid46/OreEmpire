@@ -12,6 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0e84f56ae34029449f11dad2104b096, type: 3}
   m_Name: MapSettings
   m_EditorClassIdentifier: 
-  mapSize: 256
+  noiseSettings:
+    seedX: 1000
+    seedY: 1000
+    scale: 1
+    amplitude: 1
+    minHeight: 0
+    maxHeight: 1
   waterLevel: 0.2
-  waterColor: {r: 0, g: 0, b: 1, a: 1}
+  mapSize: 10
+  oreFieldSize: 0.4
