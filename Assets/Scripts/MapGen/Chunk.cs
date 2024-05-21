@@ -24,6 +24,7 @@ public class Chunk : MonoBehaviour
         //m_meshRenderer.sharedMaterial.SetTexture("_BaseMap", heightTexture);
         GenerateDensityMap();
         GenerateMesh();
+
     }
 
     [BurstCompile]
@@ -38,13 +39,26 @@ public class Chunk : MonoBehaviour
             {
                 Vector3 currentWorldPosition = transformWorldPosition + new Vector3(x, 0f, y);
 
-                heightMap[x, y] = Mathf.Clamp(GetHeight(currentWorldPosition, GameManager.instance.mapGen.mapSettings.noiseSettings),0.1f,0.9f);
+                heightMap[x, y] = GetHeightAverage(currentWorldPosition);
             }
         }
     }
 
     [BurstCompile]
-    private float GetHeight(Vector3 worldPosition, MapSettings.NoiseSettings noiseSettings)
+    private float GetHeightAverage(Vector3 currentWorldPosition)
+    {
+        float sumHeight = 0f;
+
+        foreach (NoiseSettings noiseSettings in GameManager.instance.mapGen.mapSettings.noiseSettings)
+        {
+            sumHeight += Mathf.Clamp(GetHeight(currentWorldPosition, noiseSettings), 0.1f, 0.9f);
+        }
+
+        return sumHeight / GameManager.instance.mapGen.mapSettings.noiseSettings.Count;
+    }
+
+    [BurstCompile]
+    private float GetHeight(Vector3 worldPosition, NoiseSettings noiseSettings)
     {
         float xCoord = worldPosition.x / GameManager.instance.mapGen.mapSettings.mapSize * noiseSettings.scale + noiseSettings.seedX;
         float zCoord = worldPosition.z / GameManager.instance.mapGen.mapSettings.mapSize * noiseSettings.scale + noiseSettings.seedY;
@@ -64,11 +78,11 @@ public class Chunk : MonoBehaviour
             {
                 for (int y = 0; y < MapGen.chunkHeight; y++)
                 {
-                    Vector3Int worldPosition = new Vector3Int(x, y, z);
+                    Vector3 localPosition = new Vector3(x, y, z);
 
                     float height = heightMap[x, z];
 
-                    densityMap[x, y, z] = new Point(new Vector3(x, y, z), y > height * 10 ? 0f : 0.5f + height * 0.5f, Color.white);
+                    densityMap[x, y, z] = new Point(localPosition, y > height * 10 ? 0f : 1f, Color.white); //TODO height and color calc
                 }
             }
         }

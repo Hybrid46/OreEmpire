@@ -13,12 +13,11 @@ MonoBehaviour:
   m_Name: MapSettings
   m_EditorClassIdentifier: 
   noiseSettings:
-    seedX: 1000
-    seedY: 1000
-    scale: 1
-    amplitude: 1
-    minHeight: 0
-    maxHeight: 1
+  - {fileID: 11400000, guid: e96172a8e96afd5449536708d0b6cd14, type: 2}
+  - {fileID: 11400000, guid: 19c675daf5402ef419a0ac98c5ca3f91, type: 2}
+  - {fileID: 11400000, guid: e023f5e4d8698da45aee4f91f96ce148, type: 2}
+  modifiers: []
   waterLevel: 0.2
-  mapSize: 10
+  cliffLevel: 0.5
+  mapSize: 8
   oreFieldSize: 0.4

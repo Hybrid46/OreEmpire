@@ -17,6 +17,9 @@ public class MapGen : MonoBehaviour
     {
         DateTime exectime = DateTime.Now;
 
+        //TODO: height gen here then copy to chunks
+        //TODO: map modifiers like smoothing can be used here -> StaticUtils.GetPatternCirlce()
+
         mapSizeInMeters = mapSettings.mapSize * chunkSize;
         chunks = new HashSet<Chunk>(mapSettings.mapSize * mapSettings.mapSize);
         GenerateChunks();
@@ -35,11 +38,11 @@ public class MapGen : MonoBehaviour
 
     public void GenerateChunks()
     {
-        for (int y = 0; y < mapSizeInMeters; y += chunkSize)
+        for (int y = 0; y < mapSettings.mapSize; y ++)
         {
-            for (int x = 0; x < mapSizeInMeters; x += chunkSize)
+            for (int x = 0; x < mapSettings.mapSize; x ++)
             {
-                Vector3 worldPosition = new Vector3(x, 0f, y);
+                Vector3 worldPosition = new Vector3(x * chunkSize, 0f, y * chunkSize);
 
                 GameObject chunk = new GameObject();
                 chunk.transform.position = worldPosition;

@@ -213,7 +213,7 @@ public static class StaticUtils
     }
 
     //Builds 2D MxM matrix pattern, distance based, circle
-    public static Vector3[] GetPatternCirlce(float stepSize, float range, bool includeCenter = true)
+    public static (Vector3[] array, List<Vector3> list) GetPatternCirlce(float stepSize, float range, bool includeCenter = true)
     {
         int matrixSize = Mathf.CeilToInt(range / stepSize);
         List<Vector3> pattern = new List<Vector3>(matrixSize * matrixSize);
@@ -232,11 +232,11 @@ public static class StaticUtils
 
         pattern.TrimExcess();
 
-        return pattern.ToArray();
+        return (pattern.ToArray(), pattern);
     }
 
     //Builds 2D MxM matrix pattern, cube
-    public static Vector3[] GetPatternCube(float stepSize, float range, bool includeCenter = true)
+    public static (Vector3[] array, List<Vector3> list) GetPatternCube(float stepSize, float range, bool includeCenter = true)
     {
         int matrixSize = Mathf.CeilToInt(range / stepSize);
         List<Vector3> pattern = new List<Vector3>(matrixSize * matrixSize);
@@ -255,6 +255,6 @@ public static class StaticUtils
 
         pattern.TrimExcess();
 
-        return pattern.ToArray();
+        return (pattern.ToArray(), pattern);
     }
 }
