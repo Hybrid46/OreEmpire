@@ -21,52 +21,18 @@ public class Chunk : MonoBehaviour
         m_meshFilter = GetComponent<MeshFilter>();
         m_meshRenderer = GetComponent<MeshRenderer>();
         m_meshRenderer.sharedMaterial = GameManager.instance.mapGen.terrainMaterial;
-        GenerateHeightMap();
+        GetHeightMap();
         //HeightMapToTexture(); //testing only
         //m_meshRenderer.sharedMaterial.SetTexture("_BaseMap", heightTexture);
         GenerateDensityMap();
         GenerateMesh();
-        //CleanUp();
+        CleanUp();
     }
 
-    [BurstCompile]
-    private void GenerateHeightMap()
+    private void GetHeightMap()
     {
         heightMap = new float[MapGen.chunkSize + 1, MapGen.chunkSize + 1];
-        Vector3 transformWorldPosition = transform.position;
-
-        for (int y = 0; y <= MapGen.chunkSize; y++)
-        {
-            for (int x = 0; x <= MapGen.chunkSize; x++)
-            {
-                Vector3 currentWorldPosition = transformWorldPosition + new Vector3(x, 0f, y);
-
-                heightMap[x, y] = GetHeightAverage(currentWorldPosition);
-            }
-        }
-    }
-
-    [BurstCompile]
-    private float GetHeightAverage(Vector3 currentWorldPosition)
-    {
-        float sumHeight = 0f;
-
-        foreach (NoiseSettings noiseSettings in GameManager.instance.mapGen.mapSettings.noiseSettings)
-        {
-            sumHeight += Mathf.Clamp(GetHeight(currentWorldPosition, noiseSettings), 0.1f, 0.9f);
-        }
-
-        return sumHeight / GameManager.instance.mapGen.mapSettings.noiseSettings.Count;
-    }
-
-    [BurstCompile]
-    private float GetHeight(Vector3 worldPosition, NoiseSettings noiseSettings)
-    {
-        float xCoord = worldPosition.x / GameManager.instance.mapGen.mapSettings.mapSize * noiseSettings.scale + noiseSettings.seedX;
-        float zCoord = worldPosition.z / GameManager.instance.mapGen.mapSettings.mapSize * noiseSettings.scale + noiseSettings.seedY;
-
-        return Mathf.PerlinNoise(xCoord, zCoord) * noiseSettings.maxHeight + noiseSettings.minHeight;
-        //For Job -> return noise.cnoise(new float2(xCoord, zCoord)) * noiseSettings.maxHeight + noiseSettings.minHeight;
+        StaticUtils.Copy2DArrayFast(GameManager.instance.mapGen.heightMap, heightMap, (int)transform.position.x, (int)transform.position.z, MapGen.chunkSize + 1, MapGen.chunkSize + 1);
     }
 
     [BurstCompile]
@@ -99,6 +65,12 @@ public class Chunk : MonoBehaviour
     }
 
     public float GetHeight(Vector3 position) => heightMap[(int)position.x, (int)position.z];
+
+    public Bounds GetBounds()
+    {
+        Vector3 size = new Vector3(MapGen.chunkSize, MapGen.chunkHeight, MapGen.chunkSize);
+        return new Bounds(transform.position + size * 0.5f, size);
+    }
 
     /*
     //testing only
@@ -151,15 +123,17 @@ public class Chunk : MonoBehaviour
     private void OnDrawGizmos()
     {
         if (m_meshFilter == null) return;
+        if (Selection.activeGameObject == null || Selection.activeGameObject != gameObject) return;
 
         //ChunkBounds debug
         Bounds meshBounds = m_meshFilter.sharedMesh.bounds;
         Gizmos.color = new Color(0f, 1f, 1f, 0.4f);
         Gizmos.DrawCube(transform.position + meshBounds.center, meshBounds.size * 0.99f);
+        Gizmos.color = new Color(0f, 1f, 1f, 1f);
         Gizmos.DrawWireCube(transform.position + meshBounds.center, meshBounds.size * 0.99f);
 
         //Density debug
-        if (Selection.gameObjects[0] == gameObject)
+        if (densityMap != null)
         {
             for (int z = 0; z <= MapGen.chunkSize; z++)
             {
@@ -172,15 +146,15 @@ public class Chunk : MonoBehaviour
 
                         if (densityMap[x, y, z].density > 0.5f)
                         {
-                            Gizmos.color = new Color(0f, 0f, 2f, 0.4f);
+                            Gizmos.color = new Color(0f, 0f, 2f, 1f);
                         }
                         else
                         {
-                            Gizmos.color = new Color(2f, 0f, 0f, 0.4f);
+                            Gizmos.color = new Color(2f, 0f, 0f, 1f);
                         }
 
-                        Gizmos.DrawCube(transform.position + localPosition, Vector3.one * 0.6f);
-                        Gizmos.DrawWireCube(transform.position + localPosition, Vector3.one * 0.6f);
+                        Gizmos.DrawCube(transform.position + localPosition, Vector3.one * 0.2f);
+                        Gizmos.DrawWireCube(transform.position + localPosition, Vector3.one * 0.2f);
                     }
                 }
             }

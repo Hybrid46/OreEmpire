@@ -19,5 +19,5 @@ MonoBehaviour:
   modifiers: []
   waterLevel: 0.2
   cliffLevel: 0.5
-  mapSize: 16
+  mapSize: 32
   oreFieldSize: 0.4

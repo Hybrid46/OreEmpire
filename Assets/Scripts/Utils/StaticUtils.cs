@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -256,5 +257,45 @@ public static class StaticUtils
         pattern.TrimExcess();
 
         return (pattern.ToArray(), pattern);
+    }
+
+    public static void Copy2DArray(float[,] source, float[,] destination, int startX, int startY, int lengthX, int lengthY)
+    {
+        // Check the bounds to ensure we don't go out of the array limits
+        if (startX < 0 || startY < 0 || lengthX <= 0 || lengthY <= 0 ||
+            startX + lengthX > source.GetLength(0) || startY + lengthY > source.GetLength(1) ||
+            lengthX > destination.GetLength(0) || lengthY > destination.GetLength(1))
+        {
+            throw new ArgumentException("Invalid dimensions for copying array");
+        }
+
+        for (int i = 0; i < lengthX; i++)
+        {
+            for (int j = 0; j < lengthY; j++)
+            {
+                destination[i, j] = source[startX + i, startY + j];
+            }
+        }
+    }
+
+    public static void Copy2DArrayFast(float[,] source, float[,] destination, int startX, int startY, int lengthX, int lengthY)
+    {
+        // Check the bounds to ensure we don't go out of the array limits
+        if (startX < 0 || startY < 0 || lengthX <= 0 || lengthY <= 0 ||
+            startX + lengthX > source.GetLength(0) || startY + lengthY > source.GetLength(1) ||
+            lengthX > destination.GetLength(0) || lengthY > destination.GetLength(1))
+        {
+            throw new ArgumentException("Invalid dimensions for copying array");
+        }
+
+        for (int i = 0; i < lengthX; i++)
+        {
+            // Calculate the starting index in the source array and destination array for each row
+            int sourceIndex = (startX + i) * source.GetLength(1) + startY;
+            int destinationIndex = i * destination.GetLength(1);
+
+            // Copy the row from the source to the destination
+            Array.Copy(source, sourceIndex, destination, destinationIndex, lengthY);
+        }
     }
 }
