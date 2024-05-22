@@ -12,6 +12,7 @@ public class MapGen : MonoBehaviour
     public MapSettings mapSettings;
 
     public HashSet<Chunk> chunks;
+    public Material terrainMaterial;
 
     private void Start()
     {

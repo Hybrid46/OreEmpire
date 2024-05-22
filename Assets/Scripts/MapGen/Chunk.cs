@@ -1,6 +1,9 @@
 using System;
 using Unity.Burst;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 [RequireComponent(typeof(MeshRenderer))]
 [RequireComponent(typeof(MeshFilter))]
@@ -11,20 +14,19 @@ public class Chunk : MonoBehaviour
     private Point[,,] densityMap;
     private MeshFilter m_meshFilter;
     private MeshRenderer m_meshRenderer;
-    //[SerializeField] private Texture2D heightTexture; //testing only 
+    //[SerializeField] private Texture2D heightTexture; //testing only
 
     void Start()
     {
         m_meshFilter = GetComponent<MeshFilter>();
         m_meshRenderer = GetComponent<MeshRenderer>();
-        m_meshRenderer.sharedMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-        gameObject.SetActive(false);
+        m_meshRenderer.sharedMaterial = GameManager.instance.mapGen.terrainMaterial;
         GenerateHeightMap();
         //HeightMapToTexture(); //testing only
         //m_meshRenderer.sharedMaterial.SetTexture("_BaseMap", heightTexture);
         GenerateDensityMap();
         GenerateMesh();
-
+        //CleanUp();
     }
 
     [BurstCompile]
@@ -118,6 +120,12 @@ public class Chunk : MonoBehaviour
     }
     */
 
+    public void CleanUp()
+    {
+        densityMap = null;
+        heightMap = null;
+    }
+
     public void SaveChunkToDisk()
     {
         throw new NotImplementedException("Chunk not saved!");
@@ -139,13 +147,44 @@ public class Chunk : MonoBehaviour
 #endif
     }
 
+#if UNITY_EDITOR
     private void OnDrawGizmos()
     {
         if (m_meshFilter == null) return;
 
+        //ChunkBounds debug
         Bounds meshBounds = m_meshFilter.sharedMesh.bounds;
         Gizmos.color = new Color(0f, 1f, 1f, 0.4f);
         Gizmos.DrawCube(transform.position + meshBounds.center, meshBounds.size * 0.99f);
         Gizmos.DrawWireCube(transform.position + meshBounds.center, meshBounds.size * 0.99f);
+
+        //Density debug
+        if (Selection.gameObjects[0] == gameObject)
+        {
+            for (int z = 0; z <= MapGen.chunkSize; z++)
+            {
+                for (int x = 0; x <= MapGen.chunkSize; x++)
+                {
+                    for (int y = 0; y < MapGen.chunkHeight; y++)
+                    {
+                        Vector3 localPosition = new Vector3(x, y, z);
+                        float height = heightMap[x, z];
+
+                        if (densityMap[x, y, z].density > 0.5f)
+                        {
+                            Gizmos.color = new Color(0f, 0f, 2f, 0.4f);
+                        }
+                        else
+                        {
+                            Gizmos.color = new Color(2f, 0f, 0f, 0.4f);
+                        }
+
+                        Gizmos.DrawCube(transform.position + localPosition, Vector3.one * 0.6f);
+                        Gizmos.DrawWireCube(transform.position + localPosition, Vector3.one * 0.6f);
+                    }
+                }
+            }
+        }
     }
+#endif
 }
