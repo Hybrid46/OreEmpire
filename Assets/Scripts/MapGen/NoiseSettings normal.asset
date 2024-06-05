@@ -15,6 +15,5 @@ MonoBehaviour:
   seedX: 1000
   seedY: 1000
   scale: 1
-  amplitude: 1
   minHeight: 0
   maxHeight: 1

@@ -12,9 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72d8ab48bb76e2240b172d0e066be8ab, type: 3}
   m_Name: NoiseSettings bigger
   m_EditorClassIdentifier: 
-  seedX: 1000
+  seedX: 1006
   seedY: 1000
-  scale: 0.1
-  amplitude: 1
+  scale: 0.5
   minHeight: 0
   maxHeight: 1

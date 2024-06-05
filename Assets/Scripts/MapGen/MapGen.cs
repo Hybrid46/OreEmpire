@@ -22,13 +22,12 @@ public class MapGen : MonoBehaviour
     {
         DateTime exectime = DateTime.Now;
 
-        //TODO: height gen here then copy to chunks
-        //TODO: map modifiers like smoothing can be used here -> StaticUtils.GetPatternCirlce()
-
         mapSizeInMeters = mapSettings.mapSize * chunkSize;
         heightMap = new float[mapSizeInMeters + 1, mapSizeInMeters + 1];
 
         GenerateHeightMap();
+        //ApplyMapModifiers();
+        //TODO: map modifiers like smoothing can be used here -> StaticUtils.GetPatternCirlce()
 
         Debug.Log($"Heigth map[{(mapSizeInMeters + 1) * (mapSizeInMeters + 1)}] generated in: {(DateTime.Now - exectime).Milliseconds} ms");
         exectime = DateTime.Now;
@@ -99,7 +98,7 @@ public class MapGen : MonoBehaviour
         float xCoord = worldPosition.x / mapSettings.mapSize * noiseSettings.scale + noiseSettings.seedX;
         float zCoord = worldPosition.z / mapSettings.mapSize * noiseSettings.scale + noiseSettings.seedY;
 
-        return Mathf.PerlinNoise(xCoord, zCoord) * noiseSettings.maxHeight + noiseSettings.minHeight;
+        return Mathf.Clamp01(Mathf.PerlinNoise(xCoord, zCoord) * noiseSettings.maxHeight + noiseSettings.minHeight);
         //For Job -> return noise.cnoise(new float2(xCoord, zCoord)) * noiseSettings.maxHeight + noiseSettings.minHeight;
     }
 

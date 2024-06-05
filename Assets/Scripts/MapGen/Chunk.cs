@@ -50,7 +50,42 @@ public class Chunk : MonoBehaviour
 
                     float height = heightMap[x, z];
 
-                    densityMap[x, y, z] = new Point(localPosition, y > height * 10 ? 0f : 1f, Color.white); //TODO height and color calc
+                    if (y == 0)                     //bottom
+                    {
+                        densityMap[x, y, z] = new Point(localPosition, 1f, Color.white);
+                        continue;
+                    }
+
+                    if (y == MapGen.chunkHeight - 1) //top
+                    {
+                        densityMap[x, y, z] = new Point(localPosition, 0f, Color.white);
+                        continue;
+                    }
+
+                    float waterLevel = GameManager.instance.mapGen.mapSettings.waterLevel;
+                    float cliffLevel = GameManager.instance.mapGen.mapSettings.cliffLevel;
+
+                    if (height < waterLevel)        //water
+                    {
+                        densityMap[x, y, z] = new Point(localPosition, waterLevel / height * 0.5f, Color.white);
+                    }
+                    else if (height > cliffLevel)   //cliff
+                    {
+                        densityMap[x, y, z] = new Point(localPosition, Mathf.Clamp01(0.5f + height / 10f), Color.white);
+                    }
+                    else                            //ground
+                    {
+                        if (y < 5)
+                        {
+                            densityMap[x, y, z] = new Point(localPosition, 1f, Color.white);
+                        }
+                        else
+                        {
+                            densityMap[x, y, z] = new Point(localPosition, 0f, Color.white);
+                        }
+                    }
+
+                    //old densityMap[x, y, z] = new Point(localPosition, y > height * 10 ? 0f : 1f, Color.white); //TODO height and color calc
                 }
             }
         }
