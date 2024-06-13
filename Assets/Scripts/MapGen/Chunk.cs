@@ -26,7 +26,7 @@ public class Chunk : MonoBehaviour
         //m_meshRenderer.sharedMaterial.SetTexture("_BaseMap", heightTexture);
         GenerateDensityMap();
         GenerateMesh();
-        CleanUp();
+        //CleanUp();
     }
 
     private void GetHeightMap()
@@ -39,16 +39,19 @@ public class Chunk : MonoBehaviour
     private void GenerateDensityMap()
     {
         densityMap = new Point[MapGen.chunkSize + 1, MapGen.chunkHeight, MapGen.chunkSize + 1];
+        float waterLevel = GameManager.instance.mapGen.mapSettings.waterLevel;
+        float cliffLevel = GameManager.instance.mapGen.mapSettings.cliffLevel;
 
         for (int z = 0; z <= MapGen.chunkSize; z++)
         {
             for (int x = 0; x <= MapGen.chunkSize; x++)
             {
+                float height = heightMap[x, z];
+                MapGen.HeightLevel level = GameManager.instance.mapGen.GetHeightLevel(height);
+
                 for (int y = 0; y < MapGen.chunkHeight; y++)
                 {
                     Vector3 localPosition = new Vector3(x, y, z);
-
-                    float height = heightMap[x, z];
 
                     if (y == 0)                     //bottom
                     {
@@ -62,30 +65,31 @@ public class Chunk : MonoBehaviour
                         continue;
                     }
 
-                    float waterLevel = GameManager.instance.mapGen.mapSettings.waterLevel;
-                    float cliffLevel = GameManager.instance.mapGen.mapSettings.cliffLevel;
+                    if (level == MapGen.HeightLevel.Water)
+                    {
+                        densityMap[x, y, z] = new Point(localPosition, 0f, Color.white);
+                    }
 
-                    if (height < waterLevel)        //water
+                    if (level == MapGen.HeightLevel.Cliff)
                     {
-                        densityMap[x, y, z] = new Point(localPosition, waterLevel / height * 0.5f, Color.white);
+                        densityMap[x, y, z] = new Point(localPosition, 1f, Color.white);
                     }
-                    else if (height > cliffLevel)   //cliff
+
+                    if (level == MapGen.HeightLevel.Ground)
                     {
-                        densityMap[x, y, z] = new Point(localPosition, Mathf.Clamp01(0.5f + height / 10f), Color.white);
-                    }
-                    else                            //ground
-                    {
-                        if (y < 5)
+                        if (y < 4)
                         {
                             densityMap[x, y, z] = new Point(localPosition, 1f, Color.white);
+                        }
+                        else if (y == 4)
+                        {
+                            densityMap[x, y, z] = new Point(localPosition, 0.5f, Color.white);
                         }
                         else
                         {
                             densityMap[x, y, z] = new Point(localPosition, 0f, Color.white);
                         }
                     }
-
-                    //old densityMap[x, y, z] = new Point(localPosition, y > height * 10 ? 0f : 1f, Color.white); //TODO height and color calc
                 }
             }
         }
@@ -168,6 +172,7 @@ public class Chunk : MonoBehaviour
         Gizmos.DrawWireCube(transform.position + meshBounds.center, meshBounds.size * 0.99f);
 
         //Density debug
+        //Density debug
         if (densityMap != null)
         {
             for (int z = 0; z <= MapGen.chunkSize; z++)
@@ -178,18 +183,21 @@ public class Chunk : MonoBehaviour
                     {
                         Vector3 localPosition = new Vector3(x, y, z);
                         float height = heightMap[x, z];
+                        float density = densityMap[x, y, z].density;
 
-                        if (densityMap[x, y, z].density > 0.5f)
-                        {
-                            Gizmos.color = new Color(0f, 0f, 2f, 1f);
-                        }
-                        else
-                        {
-                            Gizmos.color = new Color(2f, 0f, 0f, 1f);
-                        }
+                        //if (density > 0.5f)
+                        //{
+                        //    Gizmos.color = new Color(0f, 0f, 2f, 1f);
+                        //}
+                        //else
+                        //{
+                        //    Gizmos.color = new Color(2f, 0f, 0f, 1f);
+                        //}
 
-                        Gizmos.DrawCube(transform.position + localPosition, Vector3.one * 0.2f);
-                        Gizmos.DrawWireCube(transform.position + localPosition, Vector3.one * 0.2f);
+                        Gizmos.color = new Color(density, density, density);
+
+                        Gizmos.DrawCube(transform.position + localPosition, Vector3.one * density);
+                        Gizmos.DrawWireCube(transform.position + localPosition, Vector3.one * density);
                     }
                 }
             }
