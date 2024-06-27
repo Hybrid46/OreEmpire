@@ -31,6 +31,7 @@ public class MapGen : MonoBehaviour
         heightMap = new float[mapSizeInMeters + 1, mapSizeInMeters + 1];
 
         GenerateHeightMap();
+        NormalizeHeightMap();
         ApplyMapModifiers();
 
         Debug.Log($"Heigth map[{(mapSizeInMeters + 1) * (mapSizeInMeters + 1)}] generated in: {(DateTime.Now - exectime).Milliseconds} ms");
@@ -45,6 +46,40 @@ public class MapGen : MonoBehaviour
         ActivateChunks();
 
         Debug.Log($"Chunks[{chunks.Count}] activated: {(DateTime.Now - exectime).Milliseconds} ms");
+    }
+
+    [BurstCompile]
+    private void NormalizeHeightMap()
+    {
+        float min = float.PositiveInfinity;
+        float max = float.NegativeInfinity;
+
+        //get min - max
+        for (int y = 0; y <= mapSizeInMeters; y++)
+        {
+            for (int x = 0; x <= mapSizeInMeters; x++)
+            {
+                float height = heightMap[x, y];
+                if (height >= max) max = height;
+                if (height < min) min = height;
+            }
+        }
+
+        //normalize to -> 0 - 1
+        for (int y = 0; y <= mapSizeInMeters; y++)
+        {
+            for (int x = 0; x <= mapSizeInMeters; x++)
+            {
+                float height = heightMap[x, y];
+                heightMap[x, y] = Remap(height, min, max, 0f, 1f);
+            }
+        }
+
+        float Remap(float input, float oldLow, float oldHigh, float newLow, float newHigh)
+        {
+            float t = Mathf.InverseLerp(oldLow, oldHigh, input);
+            return Mathf.Lerp(newLow, newHigh, t);
+        }
     }
 
     public void GenerateChunks()
@@ -99,11 +134,13 @@ public class MapGen : MonoBehaviour
     [BurstCompile]
     private float GetPerlinValue(Vector3 worldPosition, NoiseSettings noiseSettings)
     {
-        float xCoord = worldPosition.x / mapSettings.mapSize * noiseSettings.scale + noiseSettings.seedX;
-        float zCoord = worldPosition.z / mapSettings.mapSize * noiseSettings.scale + noiseSettings.seedY;
+        //TODO
+        float scale = noiseSettings.scale/* * mapSettings.mapSize*/;
+        float xCoord = worldPosition.x / mapSettings.mapSize * scale + noiseSettings.seedX;
+        float zCoord = worldPosition.z / mapSettings.mapSize * scale + noiseSettings.seedY;
 
-        return Mathf.Clamp01(Mathf.PerlinNoise(xCoord, zCoord) * noiseSettings.maxHeight + noiseSettings.minHeight);
-        //For Job -> return noise.cnoise(new float2(xCoord, zCoord)) * noiseSettings.maxHeight + noiseSettings.minHeight;
+        return Mathf.Clamp01(Mathf.PerlinNoise(xCoord, zCoord));
+        //For Job -> return noise.cnoise(new float2(xCoord, zCoord));
     }
 
     [BurstCompile]

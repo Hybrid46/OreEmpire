@@ -8,8 +8,6 @@ public class NoiseSettings : ScriptableObject
     [Range(1000, 1000000)] public int seedX;
     [Range(1000, 1000000)] public int seedY;
     public float scale;
-    public float minHeight;
-    public float maxHeight;
 
     private Texture2D heightTexture;
 
@@ -42,7 +40,7 @@ public class NoiseSettings : ScriptableObject
         float xCoord = worldPosition.x / 256 * scale + seedX;
         float zCoord = worldPosition.z / 256 * scale + seedY;
 
-        return Mathf.Clamp01(Mathf.PerlinNoise(xCoord, zCoord) * maxHeight + minHeight);
+        return Mathf.Clamp01(Mathf.PerlinNoise(xCoord, zCoord));
         //For Job -> return noise.cnoise(new float2(xCoord, zCoord)) * noiseSettings.maxHeight + noiseSettings.minHeight;
     }
 

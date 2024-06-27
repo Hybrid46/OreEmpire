@@ -12,12 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0e84f56ae34029449f11dad2104b096, type: 3}
   m_Name: MapSettings
   m_EditorClassIdentifier: 
+  surfaceRoughness: 0.25
+  surfaceNoiseSettings: {fileID: 11400000, guid: a65750628fe2c1f45b8e564c8bdabb4b, type: 2}
   noiseSettings:
   - {fileID: 11400000, guid: e96172a8e96afd5449536708d0b6cd14, type: 2}
   - {fileID: 11400000, guid: 19c675daf5402ef419a0ac98c5ca3f91, type: 2}
   - {fileID: 11400000, guid: e023f5e4d8698da45aee4f91f96ce148, type: 2}
   modifiers: []
   waterLevel: 0.3
-  cliffLevel: 0.6
+  cliffLevel: 0.7
   mapSize: 32
   oreFieldSize: 0.4

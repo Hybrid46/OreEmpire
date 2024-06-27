@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 72d8ab48bb76e2240b172d0e066be8ab, type: 3}
-  m_Name: NoiseSettings smaller
+  m_Name: NoiseSettings_surface
   m_EditorClassIdentifier: 
-  seedX: 1000
-  seedY: 1000
-  scale: 4
+  seedX: 0
+  seedY: 0
+  scale: 20

@@ -1,6 +1,7 @@
 using System;
 using Unity.Burst;
 using UnityEngine;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -29,6 +30,7 @@ public class Chunk : MonoBehaviour
         //CleanUp();
     }
 
+    [BurstCompile]
     private void GetHeightMap()
     {
         heightMap = new float[MapGen.chunkSize + 1, MapGen.chunkSize + 1];
@@ -39,14 +41,14 @@ public class Chunk : MonoBehaviour
     private void GenerateDensityMap()
     {
         densityMap = new Point[MapGen.chunkSize + 1, MapGen.chunkHeight, MapGen.chunkSize + 1];
-        float waterLevel = GameManager.instance.mapGen.mapSettings.waterLevel;
-        float cliffLevel = GameManager.instance.mapGen.mapSettings.cliffLevel;
+        int groundLevel = 4;
 
         for (int z = 0; z <= MapGen.chunkSize; z++)
         {
             for (int x = 0; x <= MapGen.chunkSize; x++)
             {
                 float height = heightMap[x, z];
+                float surfaceNoise = GetSurfacePerlinNoise(transform.position + new Vector3(x, 0f, z));
                 MapGen.HeightLevel level = GameManager.instance.mapGen.GetHeightLevel(height);
 
                 for (int y = 0; y < MapGen.chunkHeight; y++)
@@ -55,7 +57,7 @@ public class Chunk : MonoBehaviour
 
                     if (y == 0)                     //bottom
                     {
-                        densityMap[x, y, z] = new Point(localPosition, 1f, Color.white);
+                        densityMap[x, y, z] = new Point(localPosition, 0.5f + surfaceNoise, Color.white);
                         continue;
                     }
 
@@ -72,26 +74,31 @@ public class Chunk : MonoBehaviour
 
                     if (level == MapGen.HeightLevel.Cliff)
                     {
-                        densityMap[x, y, z] = new Point(localPosition, 1f, Color.white);
+                        densityMap[x, y, z] = new Point(localPosition, 0.5f + surfaceNoise, Color.white);
                     }
 
                     if (level == MapGen.HeightLevel.Ground)
                     {
-                        if (y < 4)
+                        if (y <= groundLevel)
                         {
-                            densityMap[x, y, z] = new Point(localPosition, 1f, Color.white);
-                        }
-                        else if (y == 4)
-                        {
-                            densityMap[x, y, z] = new Point(localPosition, 0.5f, Color.white);
+                            densityMap[x, y, z] = new Point(localPosition, 0.5f + surfaceNoise, Color.white);
                         }
                         else
                         {
                             densityMap[x, y, z] = new Point(localPosition, 0f, Color.white);
                         }
-                    }
+                    }                    
                 }
             }
+        }
+
+        float GetSurfacePerlinNoise(Vector3 worldPosition)
+        {
+            float scale = GameManager.instance.mapGen.mapSettings.surfaceNoiseSettings.scale;
+            float xCoord = worldPosition.x / GameManager.instance.mapGen.mapSettings.mapSize * scale + GameManager.instance.mapGen.mapSettings.surfaceNoiseSettings.seedX;
+            float zCoord = worldPosition.z / GameManager.instance.mapGen.mapSettings.mapSize * scale + GameManager.instance.mapGen.mapSettings.surfaceNoiseSettings.seedY;
+
+            return Mathf.Clamp01(Mathf.PerlinNoise(xCoord, zCoord)) * GameManager.instance.mapGen.mapSettings.surfaceRoughness;
         }
     }
 
@@ -103,8 +110,10 @@ public class Chunk : MonoBehaviour
         marchingCubes.CreateMeshData(m_meshFilter.sharedMesh, densityMap);
     }
 
+    [BurstCompile]
     public float GetHeight(Vector3 position) => heightMap[(int)position.x, (int)position.z];
 
+    [BurstCompile]
     public Bounds GetBounds()
     {
         Vector3 size = new Vector3(MapGen.chunkSize, MapGen.chunkHeight, MapGen.chunkSize);
