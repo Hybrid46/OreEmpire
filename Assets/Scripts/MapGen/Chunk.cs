@@ -48,12 +48,12 @@ public class Chunk : MonoBehaviour
             for (int x = 0; x <= MapGen.chunkSize; x++)
             {
                 float height = heightMap[x, z];
-                float surfaceNoise = GetSurfacePerlinNoise(transform.position + new Vector3(x, 0f, z));
                 MapGen.HeightLevel level = GameManager.instance.mapGen.GetHeightLevel(height);
 
                 for (int y = 0; y < MapGen.chunkHeight; y++)
                 {
                     Vector3 localPosition = new Vector3(x, y, z);
+                    float surfaceNoise = GetSurfacePerlinNoise(transform.position + localPosition);
 
                     if (y == 0)                     //bottom
                     {
@@ -63,31 +63,34 @@ public class Chunk : MonoBehaviour
 
                     if (y == MapGen.chunkHeight - 1) //top
                     {
-                        densityMap[x, y, z] = new Point(localPosition, 0f, Color.white);
+                        densityMap[x, y, z] = new Point(localPosition, surfaceNoise, Color.white);
                         continue;
                     }
 
                     if (level == MapGen.HeightLevel.Water)
                     {
-                        densityMap[x, y, z] = new Point(localPosition, 0f, Color.white);
+                        float density = 0f;
+
+                        if (y < groundLevel) density = surfaceNoise;
+
+                        densityMap[x, y, z] = new Point(localPosition, density, Color.white);
                     }
 
                     if (level == MapGen.HeightLevel.Cliff)
                     {
-                        densityMap[x, y, z] = new Point(localPosition, 0.5f + surfaceNoise, Color.white);
+                        float density = 0.5f + surfaceNoise;
+
+                        densityMap[x, y, z] = new Point(localPosition, density, Color.white);
                     }
 
                     if (level == MapGen.HeightLevel.Ground)
                     {
-                        if (y <= groundLevel)
-                        {
-                            densityMap[x, y, z] = new Point(localPosition, 0.5f + surfaceNoise, Color.white);
-                        }
-                        else
-                        {
-                            densityMap[x, y, z] = new Point(localPosition, 0f, Color.white);
-                        }
-                    }                    
+                        float density = surfaceNoise;
+
+                        if (y <= groundLevel) density += 0.5f;
+
+                        densityMap[x, y, z] = new Point(localPosition, density, Color.white);
+                    }
                 }
             }
         }
@@ -95,8 +98,8 @@ public class Chunk : MonoBehaviour
         float GetSurfacePerlinNoise(Vector3 worldPosition)
         {
             float scale = GameManager.instance.mapGen.mapSettings.surfaceNoiseSettings.scale;
-            float xCoord = worldPosition.x / GameManager.instance.mapGen.mapSettings.mapSize * scale + GameManager.instance.mapGen.mapSettings.surfaceNoiseSettings.seedX;
-            float zCoord = worldPosition.z / GameManager.instance.mapGen.mapSettings.mapSize * scale + GameManager.instance.mapGen.mapSettings.surfaceNoiseSettings.seedY;
+            float xCoord = worldPosition.x / GameManager.instance.mapGen.mapSettings.mapSize * scale + GameManager.instance.mapGen.mapSettings.surfaceNoiseSettings.seedX + worldPosition.y;
+            float zCoord = worldPosition.z / GameManager.instance.mapGen.mapSettings.mapSize * scale + GameManager.instance.mapGen.mapSettings.surfaceNoiseSettings.seedY + worldPosition.y;
 
             return Mathf.Clamp01(Mathf.PerlinNoise(xCoord, zCoord)) * GameManager.instance.mapGen.mapSettings.surfaceRoughness;
         }

@@ -5,7 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "MapSettings", menuName = "Scriptable Objects/MapSettings")]
 public class MapSettings : ScriptableObject
 {
-    [Range(0f, 1f)] public float surfaceRoughness = 0.25f;
+    [Range(0f, 0.5f)] public float surfaceRoughness = 0.25f;
     public NoiseSettings surfaceNoiseSettings;
     public List<NoiseSettings> noiseSettings;
     public List<MapModifier> modifiers;
