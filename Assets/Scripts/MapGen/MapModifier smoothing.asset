@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8323a82c8236f02449b3da57a5a3ed84, type: 3}
   m_Name: MapModifier smoothing
   m_EditorClassIdentifier: 
-  range: 4
+  range: 2
   intensity: 1
   modifierType: 1

@@ -23,6 +23,17 @@ public class MapGen : MonoBehaviour
 
     public Bounds worldBounds = new Bounds();
 
+    public float GetHeight(Vector3 pos)
+    {
+        int pX = (int)pos.x;
+        int pZ = (int)pos.z;
+
+        if (pX < 0 || pX >= heightMap.GetLength(0) ||
+            pZ < 0 || pZ >= heightMap.GetLength(1)) return 0f;
+
+        return heightMap[(int)pos.x, (int)pos.z];
+    }
+
     private void Start()
     {
         DateTime exectime = DateTime.Now;
@@ -43,7 +54,7 @@ public class MapGen : MonoBehaviour
         Debug.Log($"Chunks[{chunks.Count}] Initialized in: {(DateTime.Now - exectime).Milliseconds} ms");
         exectime = DateTime.Now;
 
-        ActivateChunks();
+        ActivateChunks(true);
 
         Debug.Log($"Chunks[{chunks.Count}] activated: {(DateTime.Now - exectime).Milliseconds} ms");
     }
@@ -148,7 +159,7 @@ public class MapGen : MonoBehaviour
     {
         foreach (MapModifier mapModifier in mapSettings.modifiers)
         {
-            Vector3[] pattern = StaticUtils.GetPatternCirlce(1f, mapModifier.range).array;
+            Vector3[] pattern = StaticUtils.GetPatternCirlce(1f, mapModifier.range, false).ToArray();
 
             for (int y = 0; y <= mapSizeInMeters; y++)
             {
@@ -156,80 +167,36 @@ public class MapGen : MonoBehaviour
                 {
                     Vector3 currentWorldPosition = new Vector3(x, 0f, y);
 
-                    if (mapModifier.modifierType == MapModifier.MapModifierType.Smoothing)
+                    switch (mapModifier.modifierType)
                     {
-                        heightMap[x, y] = Mathf.Lerp(heightMap[x, y], Smoothing(currentWorldPosition, pattern), mapModifier.intensity);
-                    }
+                        case MapModifier.MapModifierType.Smoothing:
+                            heightMap[x, y] = Mathf.Lerp(heightMap[x, y], StaticUtils.Averaging(currentWorldPosition, pattern, GetHeight), mapModifier.intensity);
+                            break;
 
-                    if (mapModifier.modifierType == MapModifier.MapModifierType.IDWSmoothing)
-                    {
-                        heightMap[x, y] = Mathf.Lerp(heightMap[x, y], GetHeightMapIDW(currentWorldPosition, pattern), mapModifier.intensity);
-                    }
+                        case MapModifier.MapModifierType.IDWSmoothing:
+                            heightMap[x, y] = Mathf.Lerp(heightMap[x, y], StaticUtils.InverseDistanceWeightedInterpolation(GetHeight, currentWorldPosition, pattern), mapModifier.intensity);
+                            break;
 
-                    if (mapModifier.modifierType == MapModifier.MapModifierType.MoreWater)
-                    {
-                        heightMap[x, y] = Mathf.Lerp(heightMap[x, y], 0f, mapModifier.intensity);
-                    }
+                        case MapModifier.MapModifierType.MoreWater:
+                            heightMap[x, y] = Mathf.Lerp(heightMap[x, y], 0f, mapModifier.intensity);
+                            break;
 
-                    if (mapModifier.modifierType == MapModifier.MapModifierType.MoreHills)
-                    {
-                        heightMap[x, y] = Mathf.Lerp(heightMap[x, y], 1f, mapModifier.intensity);
+                        case MapModifier.MapModifierType.MoreHills:
+                            heightMap[x, y] = Mathf.Lerp(heightMap[x, y], 1f, mapModifier.intensity);
+                            break;
                     }
                 }
             }
         }
     }
 
-    [BurstCompile]
-    private float Smoothing(Vector3 position, Vector3[] pattern)
-    {
-        float heightValue = 0f;
-        float sampleCount = 0f;
-
-        for (int p = 0; p < pattern.Length; p++)
-        {
-            Vector3 currentPos = position + pattern[p];
-
-            if (!IsCoordOnMap(currentPos)) continue;
-
-            heightValue += heightMap[(int)currentPos.x, (int)currentPos.z];
-            sampleCount++;
-        }
-
-        return heightValue / sampleCount;
-    }
-
-    [BurstCompile]
-    private float GetHeightMapIDW(Vector3 position, Vector3[] pattern)
-    {
-        float heightValue = 0f;
-        float inverseDistance = 0;
-
-        for (int p = 0; p < pattern.Length; p++)
-        {
-            Vector3 currentPos = position + pattern[p];
-            float distance = Vector3.Distance(currentPos, position);
-
-            //check map bounds
-            //not generated yet! if (!worldBounds.Contains(currentPos)) continue;
-            if (!IsCoordOnMap(currentPos)) continue;
-
-            //if (distance < 1f) distance = 1f; //center -> div by zero
-
-            distance = distance / distance;
-            heightValue += heightMap[(int)currentPos.x, (int)currentPos.z] / distance;
-            inverseDistance += 1.0f / distance;
-        }
-
-        return heightValue / inverseDistance;
-    }
-
-    private void ActivateChunks(bool active = true)
+    private void ActivateChunks(bool active)
     {
         foreach (Chunk chunk in chunks) chunk.gameObject.SetActive(active);
     }
 
     public bool IsCoordOnMap(Vector3 coord) => coord.x > 0 && coord.x <= mapSizeInMeters && coord.z > 0 && coord.z <= mapSizeInMeters;
+    public bool IsCoordOnMap(Vector2Int coord) => coord.x > 0 && coord.x <= mapSizeInMeters && coord.y > 0 && coord.y <= mapSizeInMeters;
 
     public bool IsWater(float height) => height <= mapSettings.waterLevel;
     public bool IsCliff(float height) => height >= mapSettings.cliffLevel;

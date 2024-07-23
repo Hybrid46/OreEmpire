@@ -1,14 +1,18 @@
 using System;
 using System.Collections.Generic;
+using Unity.Burst;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public static class StaticUtils
 {
+    [BurstCompile]
     public static float Remap(float input, float inputMin, float inputMax, float targetMin, float targetMax) => targetMin + (input - inputMin) * (targetMax - targetMin) / (inputMax - inputMin);
 
+    [BurstCompile]
     public static int Array3DTo1D(int x, int y, int z, int xMax, int yMax) => (z * xMax * yMax) + (y * xMax) + x;
 
+    [BurstCompile]
     public static Vector3Int Array1Dto3D(int idx, int xMax, int yMax)
     {
         int z = idx / (xMax * yMax);
@@ -18,20 +22,25 @@ public static class StaticUtils
         return new Vector3Int(x, y, z);
     }
 
+    [BurstCompile]
     public static int Array2dTo1d(int x, int y, int width) => y * width + x;
 
+    [BurstCompile]
     public static Vector2Int Array1dTo2d(int i, int width) => new Vector2Int { x = i % width, y = i / width };
 
-    public static bool PointInsideSphere(Vector3 Ppoint, Vector3 Ccenter, float Cradius) => (Vector3.Distance(Ppoint, Ccenter) <= Cradius);
+    [BurstCompile]
+    public static bool IsPointInsideSphere(Vector3 Ppoint, Vector3 Ccenter, float Cradius) => (Vector3.Distance(Ppoint, Ccenter) <= Cradius);
 
+    [BurstCompile]
     public static float Rounder(float x, float g = 16) => Mathf.Floor((x + g / 2) / g) * g;
 
-    public static int RounderInt(float x, float g = 16) => (int)(Mathf.Floor((x + g / 2) / g) * g);
+    [BurstCompile]
+    public static int Rounder(int x, int g = 16) => Mathf.FloorToInt((x + g / 2) / g) * g;
 
-    public static int RounderInt(int x, int g = 16) => (int)Mathf.Floor((x + g / 2) / g) * g;
-
+    [BurstCompile]
     public static bool IsTooSteep(Vector3 normal, Vector3 direction, float steepness) => Mathf.Abs(Vector3.Dot(normal, direction)) < steepness;
 
+    [BurstCompile]
     public static Vector3 Snap(Vector3 pos, int v)
     {
         float x = pos.x;
@@ -44,6 +53,7 @@ public static class StaticUtils
     }
 
     //Returns local coords!
+    [BurstCompile]
     public static List<Vector2> GeneratePoissonPoints(float minDistance, Vector2 bounds, int maxAttempts)
     {
         List<Vector2> points = new List<Vector2>();
@@ -106,6 +116,7 @@ public static class StaticUtils
     }
 
     //Returns Local coords!
+    [BurstCompile]
     public static List<Vector3> GeneratePoissonPoints(float minDistance, Bounds bounds, int maxAttempts)
     {
         List<Vector3> points = new List<Vector3>();
@@ -188,33 +199,53 @@ public static class StaticUtils
     public static void AddLayerToCameraCullingMask(Camera camera, string layerName) => camera.cullingMask |= (1 << LayerMask.NameToLayer(layerName));
     public static void RemoveLayerFromCameraCullingMask(Camera camera, string layerName) => camera.cullingMask &= ~(1 << LayerMask.NameToLayer(layerName));
 
-    //IDW
-    public static float GetHeightMapIDW(Vector3 position, Vector3[] pattern, Bounds bounds)
+    //Inverse distance weighted interpolation
+    //https://gisgeography.com/inverse-distance-weighting-idw-interpolation/
+    [BurstCompile]
+    public static float InverseDistanceWeightedInterpolation(Func<Vector3, float> getValueMethod, Vector3 position, Vector3[] pattern)
     {
-        //Inverse distance weighted interpolation
-        //https://gisgeography.com/inverse-distance-weighting-idw-interpolation/
-
-        float heightValue = 0;
+        float value = 0;
         float inverseDistance = 0;
 
         for (int p = 0; p < pattern.Length; p++)
         {
             Vector3 curentPos = position + pattern[p];
+            float currentValue = getValueMethod(curentPos);
+
+            if (float.IsNaN(currentValue)) continue;
+
             float distance = Vector3.Distance(curentPos, position);
 
-            //check map bounds
-            if (!bounds.Contains(curentPos)) continue;
+            if (distance == 0f) return currentValue;
 
-            distance = distance / distance;
-            heightValue += //height sampling and dividing by distance -> for example: planet.GetBiomeHeight(curentPos) / distance;
-            inverseDistance += 1.0f / distance;
+            float weight = 1.0f / distance;
+            value += currentValue * weight;
+            inverseDistance += weight;
         }
 
-        return heightValue / inverseDistance;
+        return value / inverseDistance;
+    }
+
+    [BurstCompile]
+    public static float Averaging(Vector3 position, Vector3[] pattern, Func<Vector3, float> getValueMethod)
+    {
+            float value = 0f;
+            float sampleCount = 0f;
+
+            for (int p = 0; p < pattern.Length; p++)
+            {
+                Vector3 currentPos = position + pattern[p];
+
+                value += getValueMethod(currentPos);
+                sampleCount++;
+            }
+
+            return value / sampleCount;
     }
 
     //Builds 2D MxM matrix pattern, distance based, circle
-    public static (Vector3[] array, List<Vector3> list) GetPatternCirlce(float stepSize, float range, bool includeCenter = true)
+    [BurstCompile]
+    public static List<Vector3> GetPatternCirlce(float stepSize, float range, bool includeCenter = true)
     {
         int matrixSize = Mathf.CeilToInt(range / stepSize);
         List<Vector3> pattern = new List<Vector3>(matrixSize * matrixSize);
@@ -233,11 +264,12 @@ public static class StaticUtils
 
         pattern.TrimExcess();
 
-        return (pattern.ToArray(), pattern);
+        return pattern;
     }
 
     //Builds 2D MxM matrix pattern, cube
-    public static (Vector3[] array, List<Vector3> list) GetPatternCube(float stepSize, float range, bool includeCenter = true)
+    [BurstCompile]
+    public static List<Vector3> GetPatternCube(float stepSize, float range, bool includeCenter = true)
     {
         int matrixSize = Mathf.CeilToInt(range / stepSize);
         List<Vector3> pattern = new List<Vector3>(matrixSize * matrixSize);
@@ -256,9 +288,10 @@ public static class StaticUtils
 
         pattern.TrimExcess();
 
-        return (pattern.ToArray(), pattern);
+        return pattern;
     }
 
+    [BurstCompile]
     public static void Copy2DArray(float[,] source, float[,] destination, int startX, int startY, int lengthX, int lengthY)
     {
         // Check the bounds to ensure we don't go out of the array limits
@@ -278,6 +311,7 @@ public static class StaticUtils
         }
     }
 
+    [BurstCompile]
     public static void Copy2DArrayFast(float[,] source, float[,] destination, int startX, int startY, int lengthX, int lengthY)
     {
         // Check the bounds to ensure we don't go out of the array limits

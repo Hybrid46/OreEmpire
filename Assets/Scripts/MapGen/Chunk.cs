@@ -73,14 +73,14 @@ public class Chunk : MonoBehaviour
 
                         if (y < groundLevel) density = surfaceNoise;
 
-                        densityMap[x, y, z] = new Point(localPosition, density, Color.white);
+                        densityMap[x, y, z] = new Point(localPosition, density, Color.blue);
                     }
 
                     if (level == MapGen.HeightLevel.Cliff)
                     {
                         float density = 0.5f + surfaceNoise;
 
-                        densityMap[x, y, z] = new Point(localPosition, density, Color.white);
+                        densityMap[x, y, z] = new Point(localPosition, density, Color.gray);
                     }
 
                     if (level == MapGen.HeightLevel.Ground)
@@ -89,7 +89,7 @@ public class Chunk : MonoBehaviour
 
                         if (y <= groundLevel) density += 0.5f;
 
-                        densityMap[x, y, z] = new Point(localPosition, density, Color.white);
+                        densityMap[x, y, z] = new Point(localPosition, density, Color.green);
                     }
                 }
             }
@@ -111,6 +111,8 @@ public class Chunk : MonoBehaviour
         m_meshFilter.sharedMesh = new Mesh();
         MarchingCubes marchingCubes = new MarchingCubes(densityMap, 0.5f);
         marchingCubes.CreateMeshData(m_meshFilter.sharedMesh, densityMap);
+        //MeshUtilities.FlattenTriangleNormals(m_meshFilter.sharedMesh);
+        //MeshUtilities.ConvertTrianglesToQuads(m_meshFilter.sharedMesh);
     }
 
     [BurstCompile]
