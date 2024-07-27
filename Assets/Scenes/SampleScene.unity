@@ -436,6 +436,7 @@ GameObject:
   - component: {fileID: 1470279450}
   - component: {fileID: 1470279451}
   - component: {fileID: 1470279452}
+  - component: {fileID: 1470279453}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -471,7 +472,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mapGen: {fileID: 1470279452}
-  resourceManager: {fileID: 0}
+  resourceManager: {fileID: 1470279453}
+  gameSettings: {fileID: 11400000, guid: 02957a91322c83e4091b28fd5f939037, type: 2}
 --- !u!114 &1470279452
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -490,6 +492,18 @@ MonoBehaviour:
   worldBounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
+--- !u!114 &1470279453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1470279448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19a9040392c018947b8a52e8a31e6538, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
