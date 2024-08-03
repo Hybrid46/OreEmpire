@@ -11,7 +11,6 @@ public class MapGen : MonoBehaviour
     public enum HeightLevel { Water, Ground, Cliff }
 
     public const int chunkSize = 16;
-    public const int chunkHeight = 10;
 
     public int mapSizeInMeters;
 

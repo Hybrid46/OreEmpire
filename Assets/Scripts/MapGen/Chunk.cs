@@ -40,8 +40,8 @@ public class Chunk : MonoBehaviour
     [BurstCompile]
     private void GenerateDensityMap()
     {
-        densityMap = new Point[MapGen.chunkSize + 1, MapGen.chunkHeight, MapGen.chunkSize + 1];
-        int groundLevel = 4;
+        densityMap = new Point[MapGen.chunkSize + 1, MapGen.chunkSize, MapGen.chunkSize + 1];
+        int groundLevel = 8;
 
         for (int z = 0; z <= MapGen.chunkSize; z++)
         {
@@ -50,7 +50,7 @@ public class Chunk : MonoBehaviour
                 float height = heightMap[x, z];
                 MapGen.HeightLevel level = GameManager.instance.mapGen.GetHeightLevel(height);
 
-                for (int y = 0; y < MapGen.chunkHeight; y++)
+                for (int y = 0; y < MapGen.chunkSize; y++)
                 {
                     Vector3 localPosition = new Vector3(x, y, z);
                     float surfaceNoise = GetSurfacePerlinNoise(transform.position + localPosition);
@@ -61,7 +61,7 @@ public class Chunk : MonoBehaviour
                         continue;
                     }
 
-                    if (y == MapGen.chunkHeight - 1) //top
+                    if (y == MapGen.chunkSize - 1) //top
                     {
                         densityMap[x, y, z] = new Point(localPosition, surfaceNoise, Color.white);
                         continue;
@@ -121,7 +121,7 @@ public class Chunk : MonoBehaviour
     [BurstCompile]
     public Bounds GetBounds()
     {
-        Vector3 size = new Vector3(MapGen.chunkSize, MapGen.chunkHeight, MapGen.chunkSize);
+        Vector3 size = new Vector3(MapGen.chunkSize, MapGen.chunkSize, MapGen.chunkSize);
         return new Bounds(transform.position + size * 0.5f, size);
     }
 
@@ -193,7 +193,7 @@ public class Chunk : MonoBehaviour
             {
                 for (int x = 0; x <= MapGen.chunkSize; x++)
                 {
-                    for (int y = 0; y < MapGen.chunkHeight; y++)
+                    for (int y = 0; y < MapGen.chunkSize; y++)
                     {
                         Vector3 localPosition = new Vector3(x, y, z);
                         float height = heightMap[x, z];
