@@ -489,6 +489,7 @@ MonoBehaviour:
   mapSizeInMeters: 0
   mapSettings: {fileID: 11400000, guid: 6e5984b217f754540b13ce24397bae29, type: 2}
   terrainMaterial: {fileID: 2100000, guid: e27ff1c4678b5904b99b1bc84c190658, type: 2}
+  marchingCompute: {fileID: 7200000, guid: 53954293c7af96347946b67ce180a4a0, type: 3}
   worldBounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}

@@ -19,6 +19,8 @@ public class MapGen : MonoBehaviour
     public float[,] heightMap;
     public HashSet<Chunk> chunks;
     public Material terrainMaterial;
+    public ComputeShader marchingCompute;
+    public MarchingCubesComputeHandler marchingCubesComputeHandler;
 
     public Bounds worldBounds = new Bounds();
 
@@ -48,6 +50,7 @@ public class MapGen : MonoBehaviour
         exectime = DateTime.Now;
 
         chunks = new HashSet<Chunk>(mapSettings.mapSize * mapSettings.mapSize);
+        marchingCubesComputeHandler = new MarchingCubesComputeHandler(marchingCompute);
         GenerateChunks();
 
         Debug.Log($"Chunks[{chunks.Count}] Initialized in: {(DateTime.Now - exectime).Milliseconds} ms");
@@ -206,6 +209,12 @@ public class MapGen : MonoBehaviour
         if (IsWater(height)) return HeightLevel.Water;
         if (IsCliff(height)) return HeightLevel.Cliff;
         return HeightLevel.Ground;
+    }
+
+    private void OnDestroy()
+    {
+        marchingCubesComputeHandler.Destroy();
+        marchingCubesComputeHandler = null;
     }
 
 #if UNITY_EDITOR

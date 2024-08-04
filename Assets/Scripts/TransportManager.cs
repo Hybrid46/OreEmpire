@@ -145,6 +145,6 @@ public class TransportManager
 
     private void DrawTransporterOre(ResourceType oreType, Vector3 orePosition)
     {
-        GraphicDrawer.instance.AddInstance(GameManager.instance.resourceManager.resourceMaterialLUT[oreType], orePosition, Quaternion.Euler(90, 0, 0), Vector3.one);
+        //GraphicDrawer.instance.AddInstance(GameManager.instance.resourceManager.resourceMaterialLUT[oreType], orePosition, Quaternion.Euler(90, 0, 0), Vector3.one);
     }
 }

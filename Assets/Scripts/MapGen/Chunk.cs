@@ -40,17 +40,17 @@ public class Chunk : MonoBehaviour
     [BurstCompile]
     private void GenerateDensityMap()
     {
-        densityMap = new Point[MapGen.chunkSize + 1, MapGen.chunkSize, MapGen.chunkSize + 1];
+        densityMap = new Point[MapGen.chunkSize + 1, MapGen.chunkSize + 1, MapGen.chunkSize + 1];
         int groundLevel = 8;
 
-        for (int z = 0; z <= MapGen.chunkSize; z++)
+        for (int z = 0; z < MapGen.chunkSize + 1; z++)
         {
-            for (int x = 0; x <= MapGen.chunkSize; x++)
+            for (int x = 0; x < MapGen.chunkSize + 1; x++)
             {
                 float height = heightMap[x, z];
                 MapGen.HeightLevel level = GameManager.instance.mapGen.GetHeightLevel(height);
 
-                for (int y = 0; y < MapGen.chunkSize; y++)
+                for (int y = 0; y < MapGen.chunkSize + 1; y++)
                 {
                     Vector3 localPosition = new Vector3(x, y, z);
                     float surfaceNoise = GetSurfacePerlinNoise(transform.position + localPosition);
@@ -61,7 +61,7 @@ public class Chunk : MonoBehaviour
                         continue;
                     }
 
-                    if (y == MapGen.chunkSize - 1) //top
+                    if (y == MapGen.chunkSize) //top
                     {
                         densityMap[x, y, z] = new Point(localPosition, surfaceNoise, Color.white);
                         continue;
@@ -108,11 +108,32 @@ public class Chunk : MonoBehaviour
     [BurstCompile]
     private void GenerateMesh()
     {
-        m_meshFilter.sharedMesh = new Mesh();
-        MarchingCubes marchingCubes = new MarchingCubes(densityMap, 0.5f);
-        marchingCubes.CreateMeshData(m_meshFilter.sharedMesh, densityMap);
-        //MeshUtilities.FlattenTriangleNormals(m_meshFilter.sharedMesh);
-        //MeshUtilities.ConvertTrianglesToQuads(m_meshFilter.sharedMesh);
+        //CPU chunk generation
+        //m_meshFilter.sharedMesh = new Mesh();
+        //MarchingCubes marchingCubes = new MarchingCubes(densityMap, 0.5f);
+        //marchingCubes.CreateMeshData(m_meshFilter.sharedMesh, densityMap);
+        //return;
+
+        ////MeshUtilities.FlattenTriangleNormals(m_meshFilter.sharedMesh);
+        ////MeshUtilities.ConvertTrianglesToQuads(m_meshFilter.sharedMesh);
+
+        //GPU chunk generation
+        Vector4[] pointData = new Vector4[densityMap.GetLength(0) * densityMap.GetLength(1) * densityMap.GetLength(2)];
+
+        for (int z = 0; z < densityMap.GetLength(2); z++)
+        {
+            for (int y = 0; y < densityMap.GetLength(1); y++)
+            {
+                for (int x = 0; x < densityMap.GetLength(0); x++)
+                {
+                    int index = StaticUtils.Array3DTo1D(x, y, z, densityMap.GetLength(0), densityMap.GetLength(1));
+                    pointData[index] = new Vector4(x, y, z, densityMap[x, y, z].density);
+                }
+            }
+        }
+
+        MarchingCubesComputeHandler mcch = GameManager.instance.mapGen.marchingCubesComputeHandler;
+        m_meshFilter.sharedMesh = mcch.ComputeMesh(pointData);
     }
 
     [BurstCompile]
