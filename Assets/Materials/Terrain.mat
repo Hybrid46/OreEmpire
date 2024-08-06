@@ -120,7 +120,7 @@ Material:
     - _Metallic: 0
     - _Normal_Offset: 0
     - _OcclusionStrength: 1
-    - _Offset: 0
+    - _Offset: -8.6
     - _Parallax: 0.005
     - _QueueControl: 0
     - _QueueOffset: 0
@@ -132,7 +132,7 @@ Material:
     - _SrcBlendAlpha: 1
     - _Surface: 0
     - _WorkflowMode: 1
-    - _Y_height: 16
+    - _Y_height: 12
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.3490566, g: 0.3490566, b: 0.3490566, a: 1}
