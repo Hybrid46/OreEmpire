@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0e84f56ae34029449f11dad2104b096, type: 3}
   m_Name: MapSettings
   m_EditorClassIdentifier: 
-  surfaceRoughness: 0.25
+  surfaceRoughness: 0.1
   surfaceNoiseSettings: {fileID: 11400000, guid: a65750628fe2c1f45b8e564c8bdabb4b, type: 2}
   noiseSettings:
   - {fileID: 11400000, guid: e96172a8e96afd5449536708d0b6cd14, type: 2}

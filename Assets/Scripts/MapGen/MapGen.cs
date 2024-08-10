@@ -8,11 +8,9 @@ using UnityEngine;
 
 public class MapGen : MonoBehaviour
 {
-    public enum HeightLevel { Water, Ground, Cliff }
-
     public const int chunkSize = 16;
 
-    public int mapSizeInMeters;
+    public int mapSizeInUnits;
 
     public MapSettings mapSettings;
 
@@ -39,14 +37,14 @@ public class MapGen : MonoBehaviour
     {
         DateTime exectime = DateTime.Now;
 
-        mapSizeInMeters = mapSettings.mapSize * chunkSize;
-        heightMap = new float[mapSizeInMeters + 1, mapSizeInMeters + 1];
+        mapSizeInUnits = mapSettings.mapSize * chunkSize;
+        heightMap = new float[mapSizeInUnits + 1, mapSizeInUnits + 1];
 
         GenerateHeightMap();
         NormalizeHeightMap();
         ApplyMapModifiers();
 
-        Debug.Log($"Heigth map[{(mapSizeInMeters + 1) * (mapSizeInMeters + 1)}] generated in: {(DateTime.Now - exectime).Milliseconds} ms");
+        Debug.Log($"Heigth map[{(mapSizeInUnits + 1) * (mapSizeInUnits + 1)}] generated in: {(DateTime.Now - exectime).Milliseconds} ms");
         exectime = DateTime.Now;
 
         chunks = new HashSet<Chunk>(mapSettings.mapSize * mapSettings.mapSize);
@@ -68,9 +66,9 @@ public class MapGen : MonoBehaviour
         float max = float.NegativeInfinity;
 
         //get min - max
-        for (int y = 0; y <= mapSizeInMeters; y++)
+        for (int y = 0; y <= mapSizeInUnits; y++)
         {
-            for (int x = 0; x <= mapSizeInMeters; x++)
+            for (int x = 0; x <= mapSizeInUnits; x++)
             {
                 float height = heightMap[x, y];
                 if (height >= max) max = height;
@@ -79,9 +77,9 @@ public class MapGen : MonoBehaviour
         }
 
         //normalize to -> 0 - 1
-        for (int y = 0; y <= mapSizeInMeters; y++)
+        for (int y = 0; y <= mapSizeInUnits; y++)
         {
-            for (int x = 0; x <= mapSizeInMeters; x++)
+            for (int x = 0; x <= mapSizeInUnits; x++)
             {
                 float height = heightMap[x, y];
                 heightMap[x, y] = Remap(height, min, max, 0f, 1f);
@@ -118,11 +116,11 @@ public class MapGen : MonoBehaviour
     [BurstCompile]
     private void GenerateHeightMap()
     {
-        heightMap = new float[mapSizeInMeters + 1, mapSizeInMeters + 1];
+        heightMap = new float[mapSizeInUnits + 1, mapSizeInUnits + 1];
 
-        for (int y = 0; y <= mapSizeInMeters; y++)
+        for (int y = 0; y <= mapSizeInUnits; y++)
         {
-            for (int x = 0; x <= mapSizeInMeters; x++)
+            for (int x = 0; x <= mapSizeInUnits; x++)
             {
                 Vector3 currentWorldPosition = new Vector3(x, 0f, y);
 
@@ -163,9 +161,9 @@ public class MapGen : MonoBehaviour
         {
             Vector3[] pattern = StaticUtils.GetPatternCirlce(1f, mapModifier.range, false).ToArray();
 
-            for (int y = 0; y <= mapSizeInMeters; y++)
+            for (int y = 0; y <= mapSizeInUnits; y++)
             {
-                for (int x = 0; x <= mapSizeInMeters; x++)
+                for (int x = 0; x <= mapSizeInUnits; x++)
                 {
                     Vector3 currentWorldPosition = new Vector3(x, 0f, y);
 
@@ -197,19 +195,12 @@ public class MapGen : MonoBehaviour
         foreach (Chunk chunk in chunks) chunk.gameObject.SetActive(active);
     }
 
-    public bool IsCoordOnMap(Vector3 coord) => coord.x > 0 && coord.x <= mapSizeInMeters && coord.z > 0 && coord.z <= mapSizeInMeters;
-    public bool IsCoordOnMap(Vector2Int coord) => coord.x > 0 && coord.x <= mapSizeInMeters && coord.y > 0 && coord.y <= mapSizeInMeters;
+    public bool IsCoordOnMap(Vector3 coord) => coord.x > 0 && coord.x <= mapSizeInUnits && coord.z > 0 && coord.z <= mapSizeInUnits;
+    public bool IsCoordOnMap(Vector2Int coord) => coord.x > 0 && coord.x <= mapSizeInUnits && coord.y > 0 && coord.y <= mapSizeInUnits;
 
     public bool IsWater(float height) => height <= mapSettings.waterLevel;
     public bool IsCliff(float height) => height >= mapSettings.cliffLevel;
     public bool IsGround(float height) => !IsWater(height) && !IsCliff(height);
-
-    public HeightLevel GetHeightLevel(float height)
-    {
-        if (IsWater(height)) return HeightLevel.Water;
-        if (IsCliff(height)) return HeightLevel.Cliff;
-        return HeightLevel.Ground;
-    }
 
     private void OnDestroy()
     {
@@ -235,17 +226,13 @@ public class MapGen : MonoBehaviour
         //visualize height map
         if (heightMap != null)
         {
-            for (int y = 0; y <= mapSizeInMeters; y++)
+            for (int y = 0; y <= mapSizeInUnits; y++)
             {
-                for (int x = 0; x <= mapSizeInMeters; x++)
+                for (int x = 0; x <= mapSizeInUnits; x++)
                 {
                     Vector3 currentWorldPosition = new Vector3(x, heightMap[x, y] * 20f, y);
 
-                    HeightLevel level = GetHeightLevel(heightMap[x, y]);
-
-                    if (level == HeightLevel.Water) Gizmos.color = Color.blue;
-                    if (level == HeightLevel.Cliff) Gizmos.color = Color.gray;
-                    if (level == HeightLevel.Ground) Gizmos.color = Color.green;
+                    Gizmos.color = Color.white * heightMap[x, y] / chunkSize;
 
                     Gizmos.DrawWireCube(currentWorldPosition, Vector3.one * 0.5f);
                 }

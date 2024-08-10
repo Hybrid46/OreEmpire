@@ -14,10 +14,10 @@ OcclusionCullingSettings:
 RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 10
-  m_Fog: 0
-  m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_Fog: 1
+  m_FogColor: {r: 0, g: 0.14117648, b: 0.44705883, a: 1}
   m_FogMode: 3
-  m_FogDensity: 0.01
+  m_FogDensity: 0.03
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
@@ -425,52 +425,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!28 &1097784848
-Texture2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 3
-  m_Width: 128
-  m_Height: 1
-  m_CompleteImageSize: 512
-  m_MipsStripped: 0
-  m_TextureFormat: 4
-  m_MipCount: 1
-  m_IsReadable: 1
-  m_IsPreProcessed: 0
-  m_IgnoreMipmapLimit: 1
-  m_MipmapLimitGroupName: 
-  m_StreamingMipmaps: 0
-  m_StreamingMipmapsPriority: 0
-  m_VTOnly: 0
-  m_AlphaIsTransparency: 0
-  m_ImageCount: 1
-  m_TextureDimension: 2
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 0
-    m_WrapV: 0
-    m_WrapW: 0
-  m_LightmapFormat: 0
-  m_ColorSpace: 1
-  m_PlatformBlob: 
-  image data: 512
-  _typelessdata: 000cffff0016ffff001fffff0029ffff0033ffff003cffff0046ffff0050ffff0059ffff0063ffff006dffff0477fbff1d87e5ff3796ceff50a6b7ff69b5a1ff82c48aff9bd473ffb5e35dffcef346ffe2fd33ffe5f22fffe7e62bffe9db27ffecd023ffeec51ffff0ba1bfff2af17fff5a412fff7980efff98d0afffc8206fffe7702fff97200ffed7200ffe07300ffd47300ffc87400ffbc7500ffb07500ffa47600ff977601ff8b7701ff7f7701ff737801ff677801ff5a7901ff4e7a01ff427a01ff367b01ff2a7b01ff1d7c01ff117c01ff057d01ff027d04ff067d07ff0a7d0bff0e7d0fff127d13ff167e17ff1a7e1bff1e7e1fff227e23ff267e27ff2a7e2bff2e7e2fff327e33ff367e37ff3a7e3bff3e7e3fff427e42ff467e46ff4a7e4aff4e7f4eff527f52ff567f56ff5a7f5aff5e7f5eff627f62ff667f66ff6a7f6aff6d7f6eff717f72ff757f76ff797f79ff7d7f7dff818181ff848484ff878787ff8a8a8aff8d8d8dff909090ff939393ff969696ff9a9a9aff9d9d9dffa0a0a0ffa3a3a3ffa6a6a6ffa9a9a9ffacacacffafafafffb2b2b2ffb5b5b5ffb8b8b8ffbbbbbbffbebebeffc1c1c1ffc5c5c5ffc8c8c8ffcbcbcbffcececeffd1d1d1ffd4d4d4ffd7d7d7ffdadadaffddddddffe0e0e0ffe3e3e3ffe6e6e6ffe9e9e9ffedededfff0f0f0fff3f3f3fff6f6f6fff9f9f9fffcfcfcffffffffff
-  m_StreamData:
-    serializedVersion: 2
-    offset: 0
-    size: 0
-    path: 
 --- !u!1 &1470279448
 GameObject:
   m_ObjectHideFlags: 0
@@ -566,22 +520,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gradient:
     serializedVersion: 2
-    key0: {r: 0, g: 0.047595024, b: 1, a: 1}
-    key1: {r: 0, g: 0.45767736, b: 1, a: 1}
-    key2: {r: 0.885994, g: 1, b: 0.20392156, a: 0}
+    key0: {r: 1, g: 0.33636326, b: 0, a: 1}
+    key1: {r: 0, g: 1, b: 0.21263742, a: 1}
+    key2: {r: 1, g: 0.20392156, b: 0.68235296, a: 0}
     key3: {r: 1, g: 0.4450916, b: 0, a: 0}
-    key4: {r: 0, g: 0.49056602, b: 0.004928346, a: 0}
-    key5: {r: 0.5, g: 0.5, b: 0.5, a: 0}
-    key6: {r: 1, g: 1, b: 1, a: 0}
-    key7: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0.46707377, b: 0.9528302, a: 0}
+    key5: {r: 0.31132078, g: 0.31132078, b: 0.31132078, a: 0}
+    key6: {r: 0.5754717, g: 0.5754717, b: 0.5754717, a: 0}
+    key7: {r: 0.38679248, g: 0.38679248, b: 0.38679248, a: 0}
     ctime0: 0
-    ctime1: 5590
-    ctime2: 10216
-    ctime3: 16769
-    ctime4: 27563
-    ctime5: 44140
+    ctime1: 5975
+    ctime2: 10794
+    ctime3: 15227
+    ctime4: 27178
+    ctime5: 44525
     ctime6: 65535
-    ctime7: 0
+    ctime7: 65535
     atime0: 0
     atime1: 65535
     atime2: 0
@@ -595,7 +549,7 @@ MonoBehaviour:
     m_NumColorKeys: 7
     m_NumAlphaKeys: 2
   textureResolution: 128
-  texture: {fileID: 1097784848}
+  texture: {fileID: 2800000, guid: 9cbf535d9ac7e454285988a8a2503d45, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

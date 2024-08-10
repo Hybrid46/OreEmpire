@@ -41,21 +41,20 @@ public class Chunk : MonoBehaviour
     private void GenerateDensityMap()
     {
         densityMap = new Point[MapGen.chunkSize + 1, MapGen.chunkSize + 1, MapGen.chunkSize + 1];
-        int groundLevel = 8;
 
         for (int z = 0; z < MapGen.chunkSize + 1; z++)
         {
             for (int x = 0; x < MapGen.chunkSize + 1; x++)
             {
-                float height = heightMap[x, z];
-                MapGen.HeightLevel level = GameManager.instance.mapGen.GetHeightLevel(height);
+                float height = heightMap[x, z] * MapGen.chunkSize;
+                int roundedHeight = Mathf.FloorToInt(height);
 
                 for (int y = 0; y < MapGen.chunkSize + 1; y++)
                 {
                     Vector3 localPosition = new Vector3(x, y, z);
                     float surfaceNoise = GetSurfacePerlinNoise(transform.position + localPosition);
 
-                    if (y == 0)                     //bottom
+                    if (y == 0) //bottom
                     {
                         densityMap[x, y, z] = new Point(localPosition, 0.5f + surfaceNoise, Color.white);
                         continue;
@@ -67,29 +66,18 @@ public class Chunk : MonoBehaviour
                         continue;
                     }
 
-                    if (level == MapGen.HeightLevel.Water)
+                    if (y > roundedHeight)
                     {
-                        float density = 0f;
-
-                        if (y < groundLevel) density = surfaceNoise;
+                        float density = surfaceNoise;
 
                         densityMap[x, y, z] = new Point(localPosition, density, Color.blue);
                     }
 
-                    if (level == MapGen.HeightLevel.Cliff)
+                    if (y < roundedHeight)
                     {
                         float density = 0.5f + surfaceNoise;
 
                         densityMap[x, y, z] = new Point(localPosition, density, Color.gray);
-                    }
-
-                    if (level == MapGen.HeightLevel.Ground)
-                    {
-                        float density = surfaceNoise;
-
-                        if (y <= groundLevel) density += 0.5f;
-
-                        densityMap[x, y, z] = new Point(localPosition, density, Color.green);
                     }
                 }
             }
