@@ -116,9 +116,9 @@ Material:
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
-    - _Particle1Intensity: 1
-    - _Particle2Intensity: 0.5
-    - _Particle3Intensity: 0.5
+    - _Particle1Intensity: 0.6
+    - _Particle2Intensity: 0.4
+    - _Particle3Intensity: 0.2
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _Smoothness: 0.5
@@ -133,10 +133,10 @@ Material:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _MotionVector: {r: -196.6722, g: 428.9674, b: 0, a: 0}
+    - _MotionVector: {r: 22.029297, g: 217.47032, b: 0, a: 0}
     - _Particle1_OffsetXY_SizeZ_Density_W: {r: 0.01, g: 0.01, b: 0.01, a: 5}
     - _Particle2_OffsetXY_SizeZ_Density_W: {r: 0.015, g: 0.015, b: 0.02, a: 10}
-    - _Particle3_OffsetXY_SizeZ_Density_W: {r: 0.01, g: 0.01, b: 0.01, a: 15}
+    - _Particle3_OffsetXY_SizeZ_Density_W: {r: 0.02, g: 0.02, b: 0.01, a: 15}
     - _ParticleSize: {r: 0, g: 0, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []

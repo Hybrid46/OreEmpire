@@ -57,7 +57,7 @@ public class ParticlePostEffectController : MonoBehaviour
         //Euler difference
         float signedAngleDiffX = Vector3.SignedAngle(lastRotation.eulerAngles, cameraTransform.rotation.eulerAngles, Vector3.right);
         float signedAngleDiffY = Vector3.SignedAngle(lastRotation.eulerAngles, cameraTransform.rotation.eulerAngles, Vector3.up);
-        float signedAngleDiffZ = Vector3.SignedAngle(lastRotation.eulerAngles, cameraTransform.rotation.eulerAngles, Vector3.forward);
+        float signedAngleDiffZ = Vector3.SignedAngle(lastRotation.eulerAngles, cameraTransform.rotation.eulerAngles, Vector3.back);
         Vector3 signedRotationDifference = new Vector3(signedAngleDiffX, signedAngleDiffY, signedAngleDiffZ);
 
         motionRotation = signedRotationDifference;
