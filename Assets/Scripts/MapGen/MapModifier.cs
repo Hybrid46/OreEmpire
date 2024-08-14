@@ -3,7 +3,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "MapModifier", menuName = "Scriptable Objects/MapModifier")]
 public class MapModifier : ScriptableObject
 {
-    public enum MapModifierType { IDWSmoothing, Smoothing, MoreWater, MoreHills, MicroSmoothing }
+    public enum MapModifierType { IDWSmoothing, Smoothing, MicroSmoothing }
 
     [Range(1, 10)] public int range;
     [Range(0.01f, 1f)] public float intensity;

@@ -177,13 +177,10 @@ public class MapGen : MonoBehaviour
                             heightMap[x, y] = Mathf.Lerp(heightMap[x, y], StaticUtils.InverseDistanceWeightedInterpolation(GetHeight, currentWorldPosition, pattern), mapModifier.intensity);
                             break;
 
-                        case MapModifier.MapModifierType.MoreWater:
-                            heightMap[x, y] = Mathf.Lerp(heightMap[x, y], 0f, mapModifier.intensity);
-                            break;
+                        case MapModifier.MapModifierType.MicroSmoothing:
+                            throw new NotImplementedException();
+                            //break;
 
-                        case MapModifier.MapModifierType.MoreHills:
-                            heightMap[x, y] = Mathf.Lerp(heightMap[x, y], 1f, mapModifier.intensity);
-                            break;
                     }
                 }
             }
@@ -197,10 +194,6 @@ public class MapGen : MonoBehaviour
 
     public bool IsCoordOnMap(Vector3 coord) => coord.x > 0 && coord.x <= mapSizeInUnits && coord.z > 0 && coord.z <= mapSizeInUnits;
     public bool IsCoordOnMap(Vector2Int coord) => coord.x > 0 && coord.x <= mapSizeInUnits && coord.y > 0 && coord.y <= mapSizeInUnits;
-
-    public bool IsWater(float height) => height <= mapSettings.waterLevel;
-    public bool IsCliff(float height) => height >= mapSettings.cliffLevel;
-    public bool IsGround(float height) => !IsWater(height) && !IsCliff(height);
 
     private void OnDestroy()
     {

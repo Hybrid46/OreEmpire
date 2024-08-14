@@ -20,7 +20,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e023f5e4d8698da45aee4f91f96ce148, type: 2}
   modifiers:
   - {fileID: 11400000, guid: 64aad75efd010504b830eb9527d10a90, type: 2}
-  waterLevel: 0.3
-  cliffLevel: 0.7
+  terraceCount: 4
   mapSize: 32
   oreFieldSize: 0.4

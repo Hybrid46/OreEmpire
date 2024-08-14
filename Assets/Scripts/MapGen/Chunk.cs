@@ -41,13 +41,16 @@ public class Chunk : MonoBehaviour
     private void GenerateDensityMap()
     {
         densityMap = new Point[MapGen.chunkSize + 1, MapGen.chunkSize + 1, MapGen.chunkSize + 1];
+        int terraceCount = GameManager.instance.mapGen.mapSettings.terraceCount;
+        int terraceHeight = (MapGen.chunkSize - (MapGen.chunkSize % terraceCount)) / terraceCount;
 
         for (int z = 0; z < MapGen.chunkSize + 1; z++)
         {
             for (int x = 0; x < MapGen.chunkSize + 1; x++)
             {
-                float height = heightMap[x, z] * MapGen.chunkSize;
+                float height = heightMap[x, z] * terraceCount;
                 int roundedHeight = Mathf.FloorToInt(height);
+                int YHeight = roundedHeight * terraceHeight;
 
                 for (int y = 0; y < MapGen.chunkSize + 1; y++)
                 {
@@ -66,14 +69,14 @@ public class Chunk : MonoBehaviour
                         continue;
                     }
 
-                    if (y > roundedHeight)
+                    if (y > YHeight)
                     {
                         float density = surfaceNoise;
 
                         densityMap[x, y, z] = new Point(localPosition, density, Color.blue);
                     }
 
-                    if (y < roundedHeight)
+                    if (y < YHeight)
                     {
                         float density = 0.5f + surfaceNoise;
 

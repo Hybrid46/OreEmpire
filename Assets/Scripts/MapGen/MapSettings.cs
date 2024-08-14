@@ -9,8 +9,13 @@ public class MapSettings : ScriptableObject
     public NoiseSettings surfaceNoiseSettings;
     public List<NoiseSettings> noiseSettings;
     public List<MapModifier> modifiers;
-    [Range(0.1f, 0.5f)] public float waterLevel = 0.2f;
-    [Range(0.5f, 0.9f)] public float cliffLevel = 0.7f;
+    
+    [Tooltip("Terrace count for map generator")]
+    [Range(2, 8)] public int terraceCount = 3;
+
+    [Tooltip("Map size in chunks (x16)")]
     [Range(8, 256)] public int mapSize = 10;
-    [Range(0.0f, 0.9f)][Tooltip("Chance to floodfill ores to neighbour tiles")] public float oreFieldSize = 0.4f;
+
+    [Tooltip("Chance to floodfill ores to neighbour tiles")]
+    [Range(0.0f, 0.9f)] public float oreFieldSize = 0.4f;
 }
