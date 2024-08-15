@@ -13,4 +13,5 @@ Features:
 - Perlin Noise generated map and customizable modifiers like Smoothing or Distance Weighted Interpolation
 - Cavity and curvature post process effect shader -> similar to Blender
 
+https://youtu.be/XlscVcticK4
 ![Gradient Terrain](https://github.com/user-attachments/assets/47f367c0-9143-4775-94db-a3584829c7a8)
