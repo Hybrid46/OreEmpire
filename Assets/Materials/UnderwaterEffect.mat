@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-6871442485931848251
+--- !u!114 &-1222841131587692174
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
@@ -20,8 +20,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: ParticlePostEffect
-  m_Shader: {fileID: -6465566751694194690, guid: 0633d275831d02343a57efda95dc99f3, type: 3}
+  m_Name: UnderwaterEffect
+  m_Shader: {fileID: -6465566751694194690, guid: c4c33102301598941b6e21c80ec6d865, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -110,20 +110,21 @@ Material:
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
+    - _Frequenecy: 5
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
     - _Metallic: 0
     - _OcclusionStrength: 1
+    - _Offset: 0.005
     - _Parallax: 0.005
-    - _Particle1Intensity: 0.6
-    - _Particle2Intensity: 0.4
-    - _Particle3Intensity: 0.2
     - _QueueOffset: 0
     - _ReceiveShadows: 1
+    - _Scale: 10
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
+    - _Speed: 0.025
     - _SrcBlend: 1
     - _SrcBlendAlpha: 1
     - _Surface: 0
@@ -133,11 +134,6 @@ Material:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _MotionVector: {r: 82.44163, g: 331.3575, b: 0, a: 0}
-    - _Particle1_OffsetXY_SizeZ_Density_W: {r: 0.01, g: 0.01, b: 0.01, a: 5}
-    - _Particle2_OffsetXY_SizeZ_Density_W: {r: 0.015, g: 0.015, b: 0.02, a: 10}
-    - _Particle3_OffsetXY_SizeZ_Density_W: {r: 0.02, g: 0.02, b: 0.01, a: 15}
-    - _ParticleSize: {r: 0, g: 0, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

@@ -272,10 +272,10 @@ MonoBehaviour:
   offset: {x: 0, y: 2, z: -5}
   followSpeed: 5
   rotationSpeed: 5
-  minVerticalAngle: 1
+  minVerticalAngle: 20
   maxVerticalAngle: 70
   minDistance: 2
-  maxDistance: 10
+  maxDistance: 40
   zoomSpeed: 5
 --- !u!1 &410087039
 GameObject:
@@ -460,6 +460,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a43287070e87aa49afe47b28ee99be5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lastMotionVector: {x: 0, y: 0}
   motionVector: {x: 0, y: 0}
   debugData: 1
   particlePostEffectMaterial: {fileID: 2100000, guid: 336db9173ab62354dbffd532180e76a6, type: 2}
@@ -597,6 +598,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2140416326}
+  - component: {fileID: 2140416327}
   m_Layer: 0
   m_Name: CameraTarget
   m_TagString: Untagged
@@ -619,6 +621,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2140416327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2140416325}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e288a46ad14add428db6a809f87daf0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
